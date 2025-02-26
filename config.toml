@@ -1,0 +1,76 @@
+# cfg-exporter 配置模板
+
+# 配置文件路径
+source = "./samples/configs"
+# 字段描述行号
+field_comment_row = 1
+# 字段类型行号
+field_type_row = 2
+# 字段装饰器行号
+field_decorator_row = 3
+# 主体数据起始行号
+body_start_row = 6
+# 是否检验生成后的配置
+verify = true
+
+# Erlang导出配置
+[schema.erlang]
+# 字段名行号
+field_name_row = 5
+# 导出目标路径
+destination = "./samples/erlang"
+# hrl导出目录
+hrl_directory = "hrl"
+# erl导出目录
+erl_directory = "erl"
+# 模板目录
+erl_template_directory = "template"
+# 文件前缀
+file_prefix = "cfg_"
+# 表名前缀
+table_name_prefix = "cfg_"
+
+# typescript导出配置
+[schema.typescript]
+# 字段名行号
+field_name_row = 4
+# 导出目标路径
+destination = "./samples/typescript"
+# 配置类导出目录
+ts_cls_directory = "cls"
+# fbs类导出目录
+ts_fbs_directory = "fbs"
+# 文件前缀
+file_prefix = ""
+# 表名前缀
+table_name_prefix = "fbs_"
+
+# json导出配置
+[schema.json]
+# 字段名行号
+field_name_row = 4
+# 导出目标路径
+destination = "./samples/json"
+# 文件前缀
+file_prefix = ""
+# 表名前缀
+table_name_prefix = ""
+
+# flatbuffers导出配置
+[schema.flatbuffers]
+# 字段名行号
+field_name_row = 4
+# 导出目标路径
+destination = "./samples/flatbuffers"
+# fbs描述文件导出目录
+fbs_directory = "fbs"
+# 序列化文件导出目录
+bin_directory = "bin"
+# 文件前缀
+file_prefix = ""
+# 表名前缀
+table_name_prefix = "fbs_"
+# flatc可执行文件的位置
+flatc = "./samples/flatbuffers/flatc.exe"
+# 命名空间
+namespace = ""

@@ -1,0 +1,5 @@
+{{- template "head" .}}
+{{ template "get" .}}
+{{ template "list" .}}
+
+data(Key) -> erlang:element(#{{ .Table.ConfigName }}.val, get(Key)).

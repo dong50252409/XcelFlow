@@ -1,0 +1,10 @@
+package config
+
+type JSONSchema struct {
+	baseSchema
+}
+
+// 初始化JSON配置
+func initJSON(_ map[string]interface{}, bs baseSchema) Schema {
+	return &JSONSchema{baseSchema: bs}
+}
