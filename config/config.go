@@ -1,10 +1,10 @@
 package config
 
 import (
-	"cfg_exporter/flags"
 	"fmt"
 	"github.com/pelletier/go-toml/v2"
 	"os"
+	"xCelFlow/flags"
 )
 
 var Config TomlConfig

@@ -1,7 +1,7 @@
 package ts_type
 
 import (
-	"cfg_exporter/entities"
+	"xCelFlow/entities"
 )
 
 type TSFloat struct {

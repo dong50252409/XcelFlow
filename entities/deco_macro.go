@@ -1,10 +1,10 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"fmt"
 	"strconv"
 	"strings"
+	"xCelFlow/util"
 )
 
 type MacroDetail struct {

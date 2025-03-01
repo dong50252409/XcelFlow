@@ -1,11 +1,11 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"maps"
 	"math"
 	"reflect"
 	"strconv"
+	"xCelFlow/util"
 )
 
 type Integer struct {

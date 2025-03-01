@@ -1,10 +1,10 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"errors"
 	"fmt"
 	"reflect"
+	"xCelFlow/util"
 )
 
 type Tuple struct {

@@ -1,14 +1,14 @@
 package json
 
 import (
-	"cfg_exporter/entities"
-	"cfg_exporter/render"
 	"encoding/json"
 	"github.com/stoewer/go-strcase"
 	"os"
 	"path/filepath"
 	"reflect"
 	"sort"
+	"xCelFlow/entities"
+	"xCelFlow/render"
 )
 
 type JSONRender struct {

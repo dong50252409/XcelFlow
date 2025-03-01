@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"fmt"
 	"strings"
+	"xCelFlow/util"
 )
 
 // ForeignKey 外键引用

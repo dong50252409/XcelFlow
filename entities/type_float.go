@@ -1,12 +1,12 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"maps"
 	"math"
 	"math/big"
 	"reflect"
 	"strconv"
+	"xCelFlow/util"
 )
 
 type Float struct {

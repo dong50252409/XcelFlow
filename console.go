@@ -3,12 +3,12 @@
 package main
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/flags"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"xCelFlow/config"
+	"xCelFlow/flags"
 )
 
 func main() {
@@ -22,17 +22,20 @@ func main() {
 	flag.Parse()
 	if flag.NFlag() == 0 || flags.Help {
 		flag.Usage()
-	} else {
-		if flags.TomlPath != "" && flags.SchemaName != "" {
-			if _, err := os.Stat(flags.TomlPath); !os.IsNotExist(err) {
-				config.NewTomlConfig(flags.TomlPath)
-			} else {
-				panic(fmt.Errorf("配置文件不存在 %s", flags.TomlPath))
-			}
+		return
+	}
+	if flags.TomlPath != "" && flags.SchemaName != "" {
+		if _, err := os.Stat(flags.TomlPath); !os.IsNotExist(err) {
+			config.NewTomlConfig(flags.TomlPath)
 		} else {
-			config.NewTomlConfigByFlags()
+			fmt.Printf("配置文件不存在 %s\n", flags.TomlPath)
+			return
 		}
+	} else {
+		config.NewTomlConfigByFlags()
+	}
 
+	if _, err := os.Stat(config.Config.GetSource()); !os.IsNotExist(err) {
 		var filepathList []string
 		_ = filepath.WalkDir(config.Config.GetSource(),
 			func(path string, d os.DirEntry, _ error) error {
@@ -42,5 +45,7 @@ func main() {
 				return nil
 			})
 		runTask(filepathList)
+	} else {
+		fmt.Printf("配置表目录文件不存在 %s\n", config.Config.GetSource())
 	}
 }

@@ -1,7 +1,7 @@
 package fb_type
 
 import (
-	"cfg_exporter/entities"
+	"xCelFlow/entities"
 )
 
 type FBLang struct {

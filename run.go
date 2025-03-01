@@ -1,19 +1,19 @@
 package main
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/entities"
-	_ "cfg_exporter/implements/erlang"
-	_ "cfg_exporter/implements/flatbuffers"
-	_ "cfg_exporter/implements/json"
-	_ "cfg_exporter/implements/typescript"
-	"cfg_exporter/parser"
-	"cfg_exporter/reader"
-	"cfg_exporter/render"
 	"errors"
 	"fmt"
 	"runtime"
 	"strings"
+	"xCelFlow/config"
+	"xCelFlow/entities"
+	_ "xCelFlow/implements/erlang"
+	_ "xCelFlow/implements/flatbuffers"
+	_ "xCelFlow/implements/json"
+	_ "xCelFlow/implements/typescript"
+	"xCelFlow/parser"
+	"xCelFlow/reader"
+	"xCelFlow/render"
 )
 
 func run(path string, schemaName string) error {

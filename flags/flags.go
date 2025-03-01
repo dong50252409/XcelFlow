@@ -43,8 +43,8 @@ func usage() {
 		"typescript",
 	}
 
-	if _, err := fmt.Fprintf(os.Stdout, `cfg_exporter version: %s
-Usage: cfg_exporter -s %s
+	if _, err := fmt.Fprintf(os.Stdout, `xCelFlow version: %s
+Usage: xCelFlow -s %s
 
 Options:
 `, VERSION, strings.Join(supportedSchema, "|")); err != nil {

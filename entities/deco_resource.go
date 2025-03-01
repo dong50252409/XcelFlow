@@ -1,11 +1,11 @@
 package entities
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/util"
 	"fmt"
 	"os"
 	"path/filepath"
+	"xCelFlow/config"
+	"xCelFlow/util"
 )
 
 // Resource 资源引用

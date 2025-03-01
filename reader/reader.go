@@ -1,9 +1,9 @@
 package reader
 
 import (
-	"cfg_exporter/config"
 	"path/filepath"
 	"strings"
+	"xCelFlow/config"
 )
 
 type IReader interface {

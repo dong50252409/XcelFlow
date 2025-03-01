@@ -1,8 +1,8 @@
 package erl_type
 
 import (
-	"cfg_exporter/entities"
 	"fmt"
+	"xCelFlow/entities"
 )
 
 type ErlLang struct {

@@ -1,10 +1,10 @@
 package render
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/entities"
 	"fmt"
 	"os"
+	"xCelFlow/config"
+	"xCelFlow/entities"
 )
 
 type IRender interface {

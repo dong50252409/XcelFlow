@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"cfg_exporter/util"
+	"xCelFlow/util"
 )
 
 var (

@@ -1,9 +1,6 @@
 package erlang
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/entities"
-	"cfg_exporter/render"
 	"fmt"
 	"github.com/stoewer/go-strcase"
 	"os"
@@ -12,6 +9,9 @@ import (
 	"runtime"
 	"strings"
 	"text/template"
+	"xCelFlow/config"
+	"xCelFlow/entities"
+	"xCelFlow/render"
 )
 
 type ERLRender struct {

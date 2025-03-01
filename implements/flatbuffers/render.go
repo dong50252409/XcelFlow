@@ -1,17 +1,17 @@
 package flatbuffers
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/entities"
-	"cfg_exporter/implements/json"
-	"cfg_exporter/parser"
-	"cfg_exporter/render"
 	"fmt"
 	"github.com/stoewer/go-strcase"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"text/template"
+	"xCelFlow/config"
+	"xCelFlow/entities"
+	"xCelFlow/implements/json"
+	"xCelFlow/parser"
+	"xCelFlow/render"
 )
 
 type FBSRender struct {

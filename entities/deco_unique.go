@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/util"
 	"fmt"
+	"xCelFlow/config"
+	"xCelFlow/util"
 )
 
 type Unique struct {

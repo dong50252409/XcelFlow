@@ -1,12 +1,12 @@
 package entities
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/util"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
+	"xCelFlow/config"
+	"xCelFlow/util"
 )
 
 // Range 范围

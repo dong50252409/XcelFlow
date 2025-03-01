@@ -5,7 +5,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"cfg_exporter/config"
 	"fmt"
 	"image/color"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"xCelFlow/config"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"

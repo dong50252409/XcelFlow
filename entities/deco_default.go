@@ -1,8 +1,8 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"fmt"
+	"xCelFlow/util"
 )
 
 type Default struct {

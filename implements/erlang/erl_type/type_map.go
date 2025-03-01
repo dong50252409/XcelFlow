@@ -1,7 +1,7 @@
 package erl_type
 
 import (
-	"cfg_exporter/entities"
+	"xCelFlow/entities"
 )
 
 type ErlMap struct {

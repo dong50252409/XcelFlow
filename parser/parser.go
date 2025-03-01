@@ -1,13 +1,13 @@
 package parser
 
 import (
-	"cfg_exporter/config"
-	"cfg_exporter/entities"
-	"cfg_exporter/util"
 	"fmt"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"xCelFlow/config"
+	"xCelFlow/entities"
+	"xCelFlow/util"
 )
 
 type IParser interface {

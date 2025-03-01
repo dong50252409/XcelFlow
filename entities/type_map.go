@@ -1,11 +1,11 @@
 package entities
 
 import (
-	"cfg_exporter/util"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+	"xCelFlow/util"
 )
 
 type Map struct {

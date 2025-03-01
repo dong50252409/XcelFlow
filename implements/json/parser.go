@@ -1,10 +1,10 @@
 package json
 
 import (
-	"cfg_exporter/parser"
+	"xCelFlow/parser"
 )
 
-type JParser struct {
+type JSONParser struct {
 	*parser.Parser
 }
 
@@ -13,5 +13,5 @@ func init() {
 }
 
 func NewParser(p *parser.Parser) parser.IParser {
-	return &JParser{p}
+	return &JSONParser{p}
 }

@@ -1,8 +1,8 @@
 package typescript
 
 import (
-	"cfg_exporter/implements/typescript/ts_type"
-	"cfg_exporter/parser"
+	"xCelFlow/implements/typescript/ts_type"
+	"xCelFlow/parser"
 )
 
 type TSParse struct {

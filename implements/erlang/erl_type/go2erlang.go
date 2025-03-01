@@ -1,10 +1,10 @@
 package erl_type
 
 import (
-	"cfg_exporter/entities"
 	"fmt"
 	"strconv"
 	"strings"
+	"xCelFlow/entities"
 )
 
 func toString(data interface{}) string {

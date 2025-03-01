@@ -1,11 +1,11 @@
 package erlang
 
 import (
-	"cfg_exporter/implements/erlang/erl_type"
-	"cfg_exporter/parser"
+	"xCelFlow/implements/erlang/erl_type"
+	"xCelFlow/parser"
 )
 
-type ErlParser struct {
+type ERLParser struct {
 	*parser.Parser
 }
 
@@ -15,5 +15,5 @@ func init() {
 
 func NewParser(p *parser.Parser) parser.IParser {
 	p.NewTypeFunc = erl_type.NewType
-	return &ErlParser{p}
+	return &ERLParser{p}
 }

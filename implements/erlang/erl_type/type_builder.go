@@ -1,8 +1,8 @@
 package erl_type
 
 import (
-	"cfg_exporter/entities"
-	"cfg_exporter/util"
+	"xCelFlow/entities"
+	"xCelFlow/util"
 )
 
 var (

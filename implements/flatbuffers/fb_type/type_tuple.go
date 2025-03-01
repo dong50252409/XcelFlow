@@ -1,8 +1,8 @@
 package fb_type
 
 import (
-	"cfg_exporter/entities"
 	"fmt"
+	"xCelFlow/entities"
 )
 
 type FBTuple struct {

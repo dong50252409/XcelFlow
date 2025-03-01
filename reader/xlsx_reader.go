@@ -1,12 +1,12 @@
 package reader
 
 import (
-	"cfg_exporter/entities"
-	"cfg_exporter/util"
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"path/filepath"
 	"sort"
+	"xCelFlow/entities"
+	"xCelFlow/util"
 )
 
 type XLSXReader struct {
