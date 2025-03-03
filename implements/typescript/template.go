@@ -1,7 +1,7 @@
 package typescript
 
 const headTemplate = `{{- define "IMPORT_TEMPLATE" -}}
-import {flatbuffers, flexbuffers, BaseData_Fbs, cacheObjRes, FbsData, FbsDataList } from './index'
+import { flatbuffers, flexbuffers, BaseData_Fbs, cacheObjRes, FbsData, FbsDataList } from './index';
 {{- end -}}`
 
 const baseClassTemplate = `{{- define "BASE_CLASS_TEMPLATE" -}}
@@ -38,7 +38,7 @@ export class Cfg{{ $configName }}List extends FbsDataList<Cfg{{ $configName }}> 
         return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
     }
 
-    public getFbsData(index: number, obj?: Cfg{{ $configName }}): Cfg{{ $configName }} | null {
+    public getFbsData(index: number, obj?: Cfg{{ $configName }}): Cfg{{ $configName }} {
         const offset = this.bb!.__offset(this.bb_pos, 4);
         obj = obj || new Cfg{{ $configName }}();
         return offset ? obj.__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : obj;
@@ -68,14 +68,12 @@ export class Cfg{{ $configName }} extends FbsData {
     }
 
     public clone(): Cfg{{ $configName }} {
-        let obj = new Cfg{{ $configName }}();
-        if (this.bb) {
-            obj.__init(this.bb_pos, this.bb!);
-        }
-        return obj;
+        const obj = new Cfg{{ $configName }}();
+        return this.bb ? obj.__init(this.bb_pos, this.bb!) : obj;
     }
 
     {{ range $index, $field := .Table.FieldRowIter }}
+    /** {{ $field.Comment }} */
     {{- $decorator := $field.Type.DecoratorStr }}
     {{- if $decorator }}
     {{ $decorator }}
