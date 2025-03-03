@@ -5,7 +5,7 @@ import (
 )
 
 type ErlAny struct {
-	entities.ITypeSystem
+	*entities.Any
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newAny(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlAny{ITypeSystem: anyValue}, nil
+	return &ErlAny{anyValue.(*entities.Any)}, nil
 }
 
 func (s *ErlAny) Convert(val any) string {
@@ -29,6 +29,6 @@ func (s *ErlAny) String() string {
 	return "term()"
 }
 
-func (s *ErlAny) DefaultValue() string {
+func (s *ErlAny) DefaultValueStr() string {
 	return "undefined"
 }

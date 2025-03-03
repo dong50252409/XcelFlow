@@ -238,6 +238,7 @@ func runExporter(schemaNameList []string) {
 
 	borderToBlack()
 	for _, schemaName := range schemaNameList {
+		// TODO 复用table数据
 		if err := run(selectFilename, schemaName); err != nil {
 			fmt.Println(err)
 			borderToRed()

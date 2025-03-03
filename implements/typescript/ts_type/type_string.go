@@ -6,7 +6,7 @@ import (
 )
 
 type TSStr struct {
-	entities.ITypeSystem
+	*entities.Str
 }
 
 func init() {
@@ -18,7 +18,7 @@ func newStr(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &TSStr{ITypeSystem: s}, nil
+	return &TSStr{Str: s.(*entities.Str)}, nil
 }
 
 func (s *TSStr) Convert(val any) string {
@@ -26,9 +26,17 @@ func (s *TSStr) Convert(val any) string {
 }
 
 func (s *TSStr) String() string {
-	return "string"
+	return "string | null"
 }
 
-func (*TSStr) Decorator() string {
+func (*TSStr) DecoratorStr() string {
 	return "@cacheStrRes()"
+}
+
+func (*TSStr) IsReferenceType() bool {
+	return false
+}
+
+func (s *TSStr) MethodStr() string {
+	return "__string"
 }

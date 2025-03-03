@@ -2,38 +2,56 @@ package json
 
 import (
 	"encoding/json"
-	"github.com/stoewer/go-strcase"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
 	"sort"
+	"sync"
+	"xCelFlow/config"
 	"xCelFlow/entities"
 	"xCelFlow/render"
+
+	"github.com/stoewer/go-strcase"
 )
 
 type JSONRender struct {
 	*render.Render
+	*config.JSONSchema
 }
+
+var (
+	once    sync.Once
+	initErr error
+)
 
 func init() {
 	render.Register("json", newJSONRender)
 }
 
-func newJSONRender(render *render.Render) render.IRender {
-	return &JSONRender{render}
+func newJSONRender(render *render.Render) (render.IRender, error) {
+	Schema := render.Schema.(*config.JSONSchema)
+
+	if err := instance(Schema); err != nil {
+		return nil, err
+	}
+	r := &JSONRender{Render: render, JSONSchema: Schema}
+
+	return r, nil
+}
+
+func instance(schema *config.JSONSchema) error {
+	once.Do(func() {
+		if err := os.MkdirAll(schema.GetJsonDirectory(), os.ModePerm); err != nil {
+			initErr = fmt.Errorf("导出路径创建失败 %s", err)
+			return
+		}
+	})
+	return initErr
 }
 
 func (r *JSONRender) Execute() error {
-	if err := r.Render.ExecuteBefore(); err != nil {
-		return err
-	}
-
-	jsonDir := r.ExportDir()
-	if err := os.MkdirAll(jsonDir, os.ModePerm); err != nil {
-		return err
-	}
-
-	fp := filepath.Join(jsonDir, r.Filename())
+	fp := filepath.Join(r.GetJsonDirectory(), r.Filename())
 	fileIO, err := os.Create(fp)
 	if err != nil {
 		return err
@@ -50,10 +68,11 @@ func (r *JSONRender) Execute() error {
 	if len(rootMap) > 0 {
 		if jsonData, err := json.MarshalIndent(rootMap, "", "    "); err == nil {
 			_, err = fileIO.Write(jsonData)
+			return err
 		}
 	}
 
-	return err
+	return nil
 }
 
 func (r *JSONRender) dataListExecute() (dataList []map[string]any) {
@@ -134,9 +153,9 @@ func (r *JSONRender) Verify() error {
 }
 
 func (r *JSONRender) ConfigName() string {
-	return strcase.LowerCamelCase(r.Schema.GetTableNamePrefix() + r.Name)
+	return strcase.LowerCamelCase(r.GetTableNamePrefix() + r.Name)
 }
 
 func (r *JSONRender) Filename() string {
-	return strcase.KebabCase(r.Schema.GetFilePrefix()+r.Name) + ".json"
+	return strcase.KebabCase(r.GetFilePrefix()+r.Name) + ".json"
 }

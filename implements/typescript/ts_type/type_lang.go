@@ -6,7 +6,7 @@ import (
 )
 
 type TSLang struct {
-	entities.ITypeSystem
+	*entities.Lang
 }
 
 func init() {
@@ -18,7 +18,7 @@ func newLang(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &TSLang{ITypeSystem: lang}, nil
+	return &TSLang{Lang: lang.(*entities.Lang)}, nil
 }
 
 func (l *TSLang) Convert(val any) string {
@@ -29,6 +29,14 @@ func (l *TSLang) String() string {
 	return "string"
 }
 
-func (*TSLang) Decorator() string {
+func (*TSLang) DecoratorStr() string {
 	return "@cacheStrRes()"
+}
+
+func (*TSLang) IsReferenceType() bool {
+	return false
+}
+
+func (l *TSLang) MethodStr() string {
+	return "__string"
 }

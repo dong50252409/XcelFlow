@@ -67,6 +67,16 @@ func (tbl *Table) GetPrimaryKeyFields() []*Field {
 	return []*Field{}
 }
 
+// GetPrimaryKeyFieldNames 获取主键字段名列表
+func (tbl *Table) GetPrimaryKeyFieldNames() []string {
+	fields := tbl.GetPrimaryKeyFields()
+	names := make([]string, len(fields))
+	for i, field := range fields {
+		names[i] = field.Name
+	}
+	return names
+}
+
 // GetPrimaryKeyValues 获取主键值列表
 func (tbl *Table) GetPrimaryKeyValues() [][]any {
 	fields := tbl.GetPrimaryKeyFields()

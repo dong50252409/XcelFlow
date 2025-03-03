@@ -5,7 +5,7 @@ import (
 )
 
 type TSInteger struct {
-	entities.ITypeSystem
+	*entities.Integer
 }
 
 func init() {
@@ -17,11 +17,29 @@ func newInteger(typeStr string, field *entities.Field) (entities.ITypeSystem, er
 	if err != nil {
 		return nil, err
 	}
-	return &TSInteger{ITypeSystem: integer}, nil
+	return &TSInteger{Integer: integer.(*entities.Integer)}, nil
 }
 
 func (i *TSInteger) String() string {
 	return "number"
 }
 
-func (*TSInteger) Decorator() string { return "" }
+func (*TSInteger) DecoratorStr() string { return "" }
+
+func (*TSInteger) IsReferenceType() bool {
+	return false
+}
+
+func (i *TSInteger) MethodStr() string {
+	switch i.BitSize {
+	case 8:
+		return "readInt8"
+	case 16:
+		return "readInt16"
+	case 32:
+		return "readInt32"
+	case 64:
+		return "readFloat64"
+	}
+	return "readFloat64"
+}

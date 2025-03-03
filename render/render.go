@@ -2,7 +2,6 @@ package render
 
 import (
 	"fmt"
-	"os"
 	"xCelFlow/config"
 	"xCelFlow/entities"
 )
@@ -18,9 +17,9 @@ type Render struct {
 	Schema     config.Schema
 }
 
-var renderRegistry = make(map[string]func(render *Render) IRender)
+var renderRegistry = make(map[string]func(render *Render) (IRender, error))
 
-func Register(key string, cls func(render *Render) IRender) {
+func Register(key string, cls func(render *Render) (IRender, error)) {
 	renderRegistry[key] = cls
 }
 
@@ -30,9 +29,12 @@ func NewRender(schemaName string, table *entities.Table) (IRender, error) {
 		return nil, nil
 	}
 
+	Schema := config.Config.GetSchema(schemaName)
+
 	if cls, ok := renderRegistry[schemaName]; ok {
-		r := &Render{table, schemaName, config.Config.GetSchema(schemaName)}
-		return cls(r), nil
+		cr, err := cls(&Render{Table: table, SchemaName: schemaName, Schema: Schema})
+		fmt.Printf("开始导出%s配置：%s\n", schemaName, table.Filename)
+		return cr, err
 	}
 	return nil, fmt.Errorf("配置表：%s 渲染模板：%s 还没有被支持", table.Filename, schemaName)
 }
@@ -47,17 +49,4 @@ func checkSkip(table *entities.Table) bool {
 		return true
 	}
 	return false
-}
-
-func (r Render) ExportDir() string {
-	return r.Schema.GetDestination()
-}
-
-func (r Render) ExecuteBefore() error {
-	fmt.Printf("开始导出%s配置：%s\n", r.SchemaName, r.Table.Filename)
-	dir := r.ExportDir()
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		return fmt.Errorf("导出路径创建失败 %s", err)
-	}
-	return nil
 }

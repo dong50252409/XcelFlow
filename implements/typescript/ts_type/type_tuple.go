@@ -5,7 +5,7 @@ import (
 )
 
 type TSTuple struct {
-	entities.ITypeSystem
+	*entities.Tuple
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newTuple(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &TSTuple{ITypeSystem: tuple}, nil
+	return &TSTuple{Tuple: tuple.(*entities.Tuple)}, nil
 }
 
 func (*TSTuple) Convert(val any) string {
@@ -25,13 +25,17 @@ func (*TSTuple) Convert(val any) string {
 }
 
 func (*TSTuple) String() string {
-	return "any"
+	return "any[] | null"
 }
 
-func (*TSTuple) DefaultValue() string {
+func (*TSTuple) DefaultValueStr() string {
 	return "[]"
 }
 
-func (*TSTuple) Decorator() string {
+func (*TSTuple) DecoratorStr() string {
 	return "@cacheObjRes()"
+}
+
+func (*TSTuple) IsReferenceType() bool {
+	return true
 }

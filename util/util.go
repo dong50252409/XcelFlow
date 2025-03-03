@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 // SubTableName 获取表名
@@ -49,14 +48,4 @@ func ToCell(row int, col int) string {
 func Quoted(str string) string {
 	quoted := strconv.Quote(str)
 	return quoted[1 : len(quoted)-1]
-}
-
-// IsNumber 判断字符串是否为数字
-func IsNumber(s string) bool {
-	for _, r := range s {
-		if !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
 }

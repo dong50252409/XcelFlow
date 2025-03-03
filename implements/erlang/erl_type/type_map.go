@@ -5,7 +5,7 @@ import (
 )
 
 type ErlMap struct {
-	entities.ITypeSystem
+	*entities.Map
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlMap{ITypeSystem: mapType}, nil
+	return &ErlMap{mapType.(*entities.Map)}, nil
 }
 
 func (*ErlMap) Convert(val any) string {
@@ -28,6 +28,6 @@ func (m *ErlMap) String() string {
 	return "map()"
 }
 
-func (*ErlMap) DefaultValue() string {
+func (*ErlMap) DefaultValueStr() string {
 	return "#{}"
 }

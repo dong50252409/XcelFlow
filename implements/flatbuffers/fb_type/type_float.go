@@ -5,7 +5,7 @@ import (
 )
 
 type FBFloat struct {
-	entities.ITypeSystem
+	*entities.Float
 }
 
 func init() {
@@ -17,5 +17,5 @@ func newFloat(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &FBFloat{ITypeSystem: float}, nil
+	return &FBFloat{float.(*entities.Float)}, nil
 }

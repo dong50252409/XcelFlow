@@ -5,7 +5,7 @@ import (
 )
 
 type TSList struct {
-	entities.ITypeSystem
+	*entities.List
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newList(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &TSList{ITypeSystem: list}, nil
+	return &TSList{List: list.(*entities.List)}, nil
 }
 
 func (l *TSList) Convert(val any) string {
@@ -25,13 +25,17 @@ func (l *TSList) Convert(val any) string {
 }
 
 func (l *TSList) String() string {
-	return "any"
+	return "any[] | null"
 }
 
-func (*TSList) DefaultValue() string {
+func (*TSList) DefaultValueStr() string {
 	return "[]"
 }
 
-func (*TSList) Decorator() string {
+func (*TSList) DecoratorStr() string {
 	return "@cacheObjRes()"
+}
+
+func (*TSList) IsReferenceType() bool {
+	return true
 }

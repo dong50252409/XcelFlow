@@ -29,7 +29,7 @@ func (s *Str) String() string {
 	return "str"
 }
 
-func (s *Str) DefaultValue() string {
+func (s *Str) DefaultValueStr() string {
 	return `""`
 }
 
@@ -46,4 +46,16 @@ func (s *Str) CheckFunc() func(any) bool {
 		}
 		return ok
 	}
+}
+
+func (s *Str) DecoratorStr() string {
+	return ""
+}
+
+func (s *Str) IsReferenceType() bool {
+	return false
+}
+
+func (s *Str) MethodStr() string {
+	return ""
 }

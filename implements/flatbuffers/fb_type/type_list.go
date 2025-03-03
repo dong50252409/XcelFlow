@@ -6,7 +6,7 @@ import (
 )
 
 type FBList struct {
-	entities.ITypeSystem
+	*entities.List
 }
 
 func init() {
@@ -18,12 +18,12 @@ func newList(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &FBList{ITypeSystem: list}, nil
+	return &FBList{list.(*entities.List)}, nil
 }
 
 func (l *FBList) String() string {
-	t := l.ITypeSystem.(*entities.List).T
-	switch t.(type) {
+	t := l.T
+	switch l.T.(type) {
 	case *FBInteger:
 		return fmt.Sprintf("[%s]", t.(*FBInteger).String())
 	case *FBFloat:
@@ -41,6 +41,6 @@ func (l *FBList) String() string {
 	}
 }
 
-func (*FBList) DefaultValue() string {
+func (*FBList) DefaultValueStr() string {
 	return "[]"
 }

@@ -58,15 +58,6 @@ func (t *Tuple) ParseString(str string) (any, error) {
 }
 
 func (*Tuple) Convert(val any) string {
-	//var strList []string
-	//for _, e := range val.(TupleT) {
-	//	if e != nil {
-	//		strList = append(strList, fmt.Sprintf("%v", e))
-	//	} else {
-	//		break
-	//	}
-	//}
-	//return fmt.Sprintf("(%v)", strings.Join(strList, ","))
 	return fmt.Sprintf("(%v)", val)
 }
 
@@ -74,7 +65,7 @@ func (t *Tuple) String() string {
 	return "tuple"
 }
 
-func (t *Tuple) DefaultValue() string {
+func (t *Tuple) DefaultValueStr() string {
 	return "[]"
 }
 
@@ -99,4 +90,16 @@ func (t *Tuple) CheckFunc() func(any) bool {
 		}
 		return true
 	}
+}
+
+func (t *Tuple) DecoratorStr() string {
+	return ""
+}
+
+func (t *Tuple) IsReferenceType() bool {
+	return true
+}
+
+func (t *Tuple) MethodStr() string {
+	return ""
 }

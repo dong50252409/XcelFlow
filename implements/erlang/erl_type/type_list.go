@@ -5,7 +5,7 @@ import (
 )
 
 type ErlList struct {
-	entities.ITypeSystem
+	*entities.List
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newList(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &ErlList{ITypeSystem: list}, nil
+	return &ErlList{list.(*entities.List)}, nil
 }
 
 func (l *ErlList) Convert(val any) string {

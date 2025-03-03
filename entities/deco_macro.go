@@ -8,7 +8,7 @@ import (
 )
 
 type MacroDetail struct {
-	Key     any
+	Key     string
 	Value   any
 	Comment string
 }
@@ -70,13 +70,13 @@ func (m *Macro) Name() string {
 
 func (m *Macro) RunTableDecorator(tbl *Table) error {
 	for _, row := range tbl.DataSetIter() {
-		if key := row[m.KeyField.Column]; key != "" {
+		if key := row[m.KeyField.Column]; key != nil && key != "" {
 			var comment string
 			if m.CommentField != nil {
 				comment = util.Quoted(row[m.CommentField.Column].(string))
 			}
 			m.List = append(m.List, MacroDetail{
-				Key:     key,
+				Key:     fmt.Sprintf("%v", key),
 				Value:   row[m.ValueField.Column],
 				Comment: comment,
 			})

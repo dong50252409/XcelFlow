@@ -5,7 +5,7 @@ import (
 )
 
 type TSFloat struct {
-	entities.ITypeSystem
+	*entities.Float
 }
 
 func init() {
@@ -17,11 +17,22 @@ func newFloat(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &TSFloat{ITypeSystem: float}, nil
+	return &TSFloat{Float: float.(*entities.Float)}, nil
 }
 
 func (f *TSFloat) String() string {
 	return "number"
 }
 
-func (*TSFloat) Decorator() string { return "" }
+func (*TSFloat) DecoratorStr() string { return "" }
+
+func (*TSFloat) IsReferenceType() bool {
+	return false
+}
+
+func (f *TSFloat) MethodStr() string {
+	if f.BitSize == 32 {
+		return "readFloat32"
+	}
+	return "readFloat64"
+}

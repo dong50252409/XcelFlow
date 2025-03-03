@@ -5,7 +5,7 @@ import (
 )
 
 type FBAny struct {
-	entities.ITypeSystem
+	*entities.Any
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newAny(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &FBAny{ITypeSystem: anyValue}, nil
+	return &FBAny{anyValue.(*entities.Any)}, nil
 }
 
 func (s *FBAny) String() string {

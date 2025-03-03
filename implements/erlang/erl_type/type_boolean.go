@@ -5,7 +5,7 @@ import (
 )
 
 type ErlBoolean struct {
-	entities.ITypeSystem
+	*entities.Boolean
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newBoolean(typeStr string, field *entities.Field) (entities.ITypeSystem, er
 	if err != nil {
 		return nil, err
 	}
-	return &ErlBoolean{ITypeSystem: boolean}, nil
+	return &ErlBoolean{boolean.(*entities.Boolean)}, nil
 }
 
 func (b *ErlBoolean) String() string {

@@ -5,7 +5,7 @@ import (
 )
 
 type FBLang struct {
-	entities.ITypeSystem
+	*entities.Lang
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newLang(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &FBLang{ITypeSystem: lang}, nil
+	return &FBLang{lang.(*entities.Lang)}, nil
 }
 
 func (l *FBLang) String() string {

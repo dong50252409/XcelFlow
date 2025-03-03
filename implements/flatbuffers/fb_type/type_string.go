@@ -5,7 +5,7 @@ import (
 )
 
 type FBStr struct {
-	entities.ITypeSystem
+	*entities.Str
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newStr(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &FBStr{ITypeSystem: s}, nil
+	return &FBStr{s.(*entities.Str)}, nil
 }
 
 func (s *FBStr) String() string {

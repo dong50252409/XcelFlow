@@ -3,13 +3,15 @@ package reader
 import (
 	"errors"
 	"fmt"
+	"xCelFlow/util"
 )
 
 var (
-	ErrorTableTempFile     error
-	ErrorTableNotSupported error
-	ErrorTableReadFailed   error
-	ErrorTableNotSheet     error
+	ErrorTableTempFile        error
+	ErrorTableNotSupported    error
+	ErrorTableReadFailed      error
+	ErrorTableNotSheet        error
+	ErrorTableSheetHeadRepeat error
 )
 
 func errorTableTempFile(path string) error {
@@ -30,4 +32,9 @@ func errorTableReadFailed(path string, err error) error {
 func errorTableNotSheet(path string) error {
 	ErrorTableNotSheet = errors.New(fmt.Sprintf("没有发现可读取的数据，请检查页签名命名是否正确！%s", path))
 	return ErrorTableNotSheet
+}
+
+func errorTableSheetHeadRepeat(sheetName string, colIndex int) error {
+	ErrorTableSheetHeadRepeat = errors.New(fmt.Sprintf("页签！%s，单元格！%s，存在重复表头", sheetName, util.ToCell(0, colIndex)))
+	return ErrorTableSheetHeadRepeat
 }

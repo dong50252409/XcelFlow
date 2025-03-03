@@ -6,7 +6,7 @@ import (
 )
 
 type ErlLang struct {
-	entities.ITypeSystem
+	*entities.Lang
 }
 
 func init() {
@@ -18,7 +18,7 @@ func newLang(typeStr string, field *entities.Field) (entities.ITypeSystem, error
 	if err != nil {
 		return nil, err
 	}
-	return &ErlLang{ITypeSystem: lang}, nil
+	return &ErlLang{lang.(*entities.Lang)}, nil
 }
 
 func (l *ErlLang) Convert(val any) string {
@@ -29,6 +29,6 @@ func (l *ErlLang) String() string {
 	return "binary()"
 }
 
-func (l *ErlLang) DefaultValue() string {
+func (l *ErlLang) DefaultValueStr() string {
 	return "<<>>"
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type ErlTuple struct {
-	entities.ITypeSystem
+	*entities.Tuple
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newTuple(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &ErlTuple{ITypeSystem: tuple}, nil
+	return &ErlTuple{tuple.(*entities.Tuple)}, nil
 }
 
 func (*ErlTuple) Convert(val any) string {
@@ -28,6 +28,6 @@ func (*ErlTuple) String() string {
 	return "tuple()"
 }
 
-func (*ErlTuple) DefaultValue() string {
+func (*ErlTuple) DefaultValueStr() string {
 	return "{}"
 }

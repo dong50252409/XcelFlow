@@ -6,7 +6,7 @@ import (
 )
 
 type TSAny struct {
-	entities.ITypeSystem
+	*entities.Any
 }
 
 func init() {
@@ -18,7 +18,7 @@ func newAny(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &TSAny{ITypeSystem: anyValue}, nil
+	return &TSAny{Any: anyValue.(*entities.Any)}, nil
 }
 
 func (s *TSAny) Convert(val any) string {
@@ -26,9 +26,13 @@ func (s *TSAny) Convert(val any) string {
 }
 
 func (s *TSAny) String() string {
-	return "any"
+	return "any | null"
 }
 
-func (*TSAny) Decorator() string {
+func (*TSAny) DecoratorStr() string {
 	return "@cacheObjRes()"
+}
+
+func (*TSAny) IsReferenceType() bool {
+	return true
 }

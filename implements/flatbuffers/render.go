@@ -2,36 +2,73 @@ package flatbuffers
 
 import (
 	"fmt"
-	"github.com/stoewer/go-strcase"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"text/template"
 	"xCelFlow/config"
 	"xCelFlow/entities"
 	"xCelFlow/implements/json"
 	"xCelFlow/parser"
 	"xCelFlow/render"
+
+	"github.com/stoewer/go-strcase"
 )
 
 type FBSRender struct {
 	*render.Render
-	Schema *config.FlatbuffersSchema
+	*config.FlatbuffersSchema
+	tmpl *template.Template
 }
+
+var (
+	once    sync.Once
+	tmpl    *template.Template
+	initErr error
+)
 
 func init() {
 	render.Register("flatbuffers", newtsRender)
 }
 
-func newtsRender(render *render.Render) render.IRender {
-	return &FBSRender{render, render.Schema.(*config.FlatbuffersSchema)}
+func newtsRender(render *render.Render) (render.IRender, error) {
+	Schema := render.Schema.(*config.FlatbuffersSchema)
+
+	if err := instance(Schema); err != nil {
+		return nil, err
+	}
+	r := &FBSRender{Render: render, FlatbuffersSchema: Schema, tmpl: tmpl}
+
+	return r, nil
+}
+
+func instance(schema *config.FlatbuffersSchema) error {
+	once.Do(func() {
+		tmpl = template.New("flatbuffers").Funcs(entities.FuncMap)
+		for _, tmplStr := range []string{packageTemplate, dataSetTemplate, tailTemplate, fbTemplate} {
+			if _, err := tmpl.Parse(tmplStr); err != nil {
+				initErr = err
+				return
+			}
+		}
+
+		// 创建目录
+		if err := os.MkdirAll(schema.GetFbsDirectory(), os.ModePerm); err != nil {
+			initErr = fmt.Errorf("导出路径创建失败 %s", err)
+			return
+		}
+
+		if err := os.MkdirAll(schema.GetBinDirectory(), os.ModePerm); err != nil {
+			initErr = fmt.Errorf("导出路径创建失败 %s", err)
+			return
+		}
+	})
+
+	return initErr
 }
 
 func (r *FBSRender) Execute() error {
-	if err := r.Render.ExecuteBefore(); err != nil {
-		return err
-	}
-
 	if err := r.fbsExecute(); err != nil {
 		return err
 	}
@@ -45,32 +82,16 @@ func (r *FBSRender) Execute() error {
 
 // fbsExecute 导出描述文件
 func (r *FBSRender) fbsExecute() error {
-	fbsDir := r.FbsDir()
-	if err := os.MkdirAll(fbsDir, os.ModePerm); err != nil {
-		return err
-	}
-
-	fp := filepath.Join(fbsDir, r.Filename())
+	fp := filepath.Join(r.GetFbsDirectory(), r.Filename())
 	fileIO, err := os.Create(fp)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = fileIO.Close() }()
 
-	// 必备数据
+	// 模板必备数据
 	data := map[string]any{"Table": r}
-
-	// 解析模板字符串
-	tmpl := template.New("flatbuffers").Funcs(entities.FuncMap)
-
-	for _, tmplStr := range []string{dataSetTemplate, tailTemplate, fbTemplate} {
-		if tmpl, err = tmpl.Parse(tmplStr); err != nil {
-			return err
-		}
-	}
-
-	// 执行模板渲染并输出到文件
-	if err = tmpl.Execute(fileIO, data); err != nil {
+	if err = r.tmpl.Execute(fileIO, data); err != nil {
 		return err
 	}
 
@@ -93,11 +114,11 @@ func (r *FBSRender) binExport() error {
 		return err
 	}
 
-	flatc := r.Schema.GetFlatc()
-	binDir := r.BinDir()
-	fbFilename := filepath.Join(r.FbsDir(), r.Filename())
+	flatc := r.GetFlatc()
+	binDir := r.GetBinDirectory()
+	fbFilename := filepath.Join(r.GetFbsDirectory(), r.Filename())
 	jr := jsonRender.(*json.JSONRender)
-	jsonFilename := filepath.Join(jr.ExportDir(), jr.Filename())
+	jsonFilename := filepath.Join(jr.GetJsonDirectory(), jr.Filename())
 	cmd := exec.Command(flatc, "--no-warnings", "--unknown-json", "-o", binDir, "-b", fbFilename, jsonFilename)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("error: %s", string(output))
@@ -111,23 +132,13 @@ func (r *FBSRender) Verify() error {
 }
 
 func (r *FBSRender) ConfigName() string {
-	return strcase.UpperCamelCase(r.Schema.GetTableNamePrefix() + r.Name)
+	return strcase.UpperCamelCase(r.GetTableNamePrefix() + r.Name)
 }
 
 func (r *FBSRender) Filename() string {
-	return strcase.SnakeCase(r.Schema.GetFilePrefix()+r.Name) + ".fbs"
+	return strcase.SnakeCase(r.GetFilePrefix()+r.Name) + ".fbs"
 }
 
 func (r *FBSRender) Namespace() string {
-	return r.Schema.GetNamespace()
-}
-
-// FbsDir flatbuffers描述文件目录
-func (r *FBSRender) FbsDir() string {
-	return filepath.Join(r.ExportDir(), r.Schema.GetFbsDirectory())
-}
-
-// BinDir flatbuffers序列化数据目录
-func (r *FBSRender) BinDir() string {
-	return filepath.Join(r.ExportDir(), r.Schema.GetBinDirectory())
+	return r.GetNamespace()
 }

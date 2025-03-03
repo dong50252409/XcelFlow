@@ -34,7 +34,7 @@ func (b *Boolean) String() string {
 	return "bool"
 }
 
-func (b *Boolean) DefaultValue() string {
+func (b *Boolean) DefaultValueStr() string {
 	return "false"
 }
 
@@ -44,4 +44,16 @@ func (b *Boolean) Kind() reflect.Kind {
 
 func (b *Boolean) CheckFunc() func(any) bool {
 	return func(v any) bool { _, ok := v.(bool); return ok }
+}
+
+func (b *Boolean) DecoratorStr() string {
+	return ""
+}
+
+func (b *Boolean) IsReferenceType() bool {
+	return false
+}
+
+func (b *Boolean) MethodStr() string {
+	return ""
 }

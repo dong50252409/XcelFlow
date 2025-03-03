@@ -3,14 +3,12 @@ package config
 type baseSchema struct {
 	Schema
 	FieldNameRow    int    `toml:"field_name_row"`
-	Destination     string `toml:"destination"`
 	FilePrefix      string `toml:"file_prefix"`
 	TableNamePrefix string `toml:"table_name_prefix"`
 }
 
 type Schema interface {
 	GetFieldNameRow() int
-	GetDestination() string
 	GetFilePrefix() string
 	GetTableNamePrefix() string
 }
@@ -27,7 +25,6 @@ func initSchemas(cfg map[string]interface{}) map[string]Schema {
 func initSchema(schemaName string, schemaArgs map[string]interface{}, schema map[string]Schema) {
 	bs := baseSchema{
 		FieldNameRow:    int(schemaArgs["field_name_row"].(int64)),
-		Destination:     schemaArgs["destination"].(string),
 		FilePrefix:      schemaArgs["file_prefix"].(string),
 		TableNamePrefix: schemaArgs["table_name_prefix"].(string),
 	}
@@ -46,11 +43,6 @@ func initSchema(schemaName string, schemaArgs map[string]interface{}, schema map
 // GetFieldNameRow 获取字段名行
 func (b *baseSchema) GetFieldNameRow() int {
 	return b.FieldNameRow
-}
-
-// GetDestination 获取目标路径
-func (b *baseSchema) GetDestination() string {
-	return b.Destination
 }
 
 // GetFilePrefix 获取文件前缀

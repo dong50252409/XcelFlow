@@ -5,7 +5,7 @@ import (
 )
 
 type FBInteger struct {
-	entities.ITypeSystem
+	*entities.Integer
 }
 
 func init() {
@@ -17,11 +17,11 @@ func newInteger(typeStr string, field *entities.Field) (entities.ITypeSystem, er
 	if err != nil {
 		return nil, err
 	}
-	return &FBInteger{ITypeSystem: integer}, nil
+	return &FBInteger{integer.(*entities.Integer)}, nil
 }
 
 func (i *FBInteger) String() string {
-	switch i.ITypeSystem.(*entities.Integer).BitSize {
+	switch i.BitSize {
 	case 8:
 		return "int8"
 	case 16:

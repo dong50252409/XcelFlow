@@ -29,7 +29,7 @@ func (l *Lang) String() string {
 	return "lang"
 }
 
-func (l *Lang) DefaultValue() string {
+func (l *Lang) DefaultValueStr() string {
 	return `""`
 }
 
@@ -46,4 +46,16 @@ func (l *Lang) CheckFunc() func(any) bool {
 		}
 		return ok
 	}
+}
+
+func (l *Lang) DecoratorStr() string {
+	return ""
+}
+
+func (l *Lang) IsReferenceType() bool {
+	return false
+}
+
+func (l *Lang) MethodStr() string {
+	return ""
 }

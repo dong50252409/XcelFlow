@@ -72,7 +72,7 @@ func (i *Integer) String() string {
 	}
 }
 
-func (i *Integer) DefaultValue() string {
+func (i *Integer) DefaultValueStr() string {
 	return "0"
 }
 
@@ -113,4 +113,16 @@ func (i *Integer) CheckFunc() func(any) bool {
 	default:
 		return func(v any) bool { _, ok := v.(int64); return ok }
 	}
+}
+
+func (i *Integer) DecoratorStr() string {
+	return ""
+}
+
+func (i *Integer) IsReferenceType() bool {
+	return false
+}
+
+func (i *Integer) MethodStr() string {
+	return ""
 }

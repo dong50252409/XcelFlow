@@ -5,7 +5,7 @@ import (
 )
 
 type FBMap struct {
-	entities.ITypeSystem
+	*entities.Map
 }
 
 func init() {
@@ -17,13 +17,13 @@ func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &FBMap{ITypeSystem: mapType}, nil
+	return &FBMap{mapType.(*entities.Map)}, nil
 }
 
 func (m *FBMap) String() string {
 	return "[ubyte](flexbuffer)"
 }
 
-func (*FBMap) DefaultValue() string {
+func (*FBMap) DefaultValueStr() string {
 	return "[]"
 }

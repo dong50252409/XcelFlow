@@ -5,7 +5,7 @@ import (
 )
 
 type ErlFloat struct {
-	entities.ITypeSystem
+	*entities.Float
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newFloat(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &ErlFloat{ITypeSystem: float}, nil
+	return &ErlFloat{float.(*entities.Float)}, nil
 }
 
 func (f *ErlFloat) String() string {

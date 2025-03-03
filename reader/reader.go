@@ -12,12 +12,8 @@ type IReader interface {
 
 type Reader struct {
 	IReader
-	Path                string
-	FieldNameIndexList  []int
-	FieldTypeIndex      int
-	FieldDecoratorIndex int
-	FieldCommentIndex   int
-	BodyStartIndex      int
+	*config.TomlConfig
+	Path string
 }
 
 var registry = make(map[string]func(reader *Reader) IReader)
@@ -37,14 +33,10 @@ func NewReader(path string) (IReader, error) {
 	if !ok {
 		return nil, errorTableNotSupported(path)
 	}
-
 	r := cls(&Reader{
-		Path:                path,
-		FieldNameIndexList:  config.GetFieldNameIndexList(),
-		FieldTypeIndex:      config.GetFieldTypeIndex(),
-		FieldDecoratorIndex: config.GetFieldDecoratorIndex(),
-		FieldCommentIndex:   config.GetFieldCommentIndex(),
-		BodyStartIndex:      config.GetBodyStartIndex()})
+		Path:       path,
+		TomlConfig: &config.Config,
+	})
 
 	return r, nil
 }

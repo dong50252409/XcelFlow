@@ -10,6 +10,7 @@ import (
 )
 
 type Float struct {
+	ITypeSystem
 	Field   *Field
 	BitSize int
 }
@@ -62,7 +63,7 @@ func (f *Float) String() string {
 	return "float64"
 }
 
-func (f *Float) DefaultValue() string {
+func (f *Float) DefaultValueStr() string {
 	return "0.0"
 }
 
@@ -81,4 +82,16 @@ func (f *Float) CheckFunc() func(any) bool {
 		}
 	}
 	return func(v any) bool { _, ok := v.(float64); return ok }
+}
+
+func (f *Float) DecoratorStr() string {
+	return ""
+}
+
+func (f *Float) IsReferenceType() bool {
+	return false
+}
+
+func (f *Float) MethodStr() string {
+	return ""
 }

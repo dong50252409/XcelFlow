@@ -63,7 +63,7 @@ func (l *List) String() string {
 	return "list"
 }
 
-func (l *List) DefaultValue() string {
+func (l *List) DefaultValueStr() string {
 	return "[]"
 }
 
@@ -85,4 +85,16 @@ func (l *List) CheckFunc() func(any) bool {
 		}
 		return true
 	}
+}
+
+func (l *List) DecoratorStr() string {
+	return ""
+}
+
+func (l *List) IsReferenceType() bool {
+	return true
+}
+
+func (l *List) MethodStr() string {
+	return ""
 }

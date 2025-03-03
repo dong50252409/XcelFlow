@@ -23,19 +23,9 @@ type IParser interface {
 
 type Parser struct {
 	*entities.Table
+	*config.TomlConfig
+	schemaName  string
 	NewTypeFunc func(string, *entities.Field) (entities.ITypeSystem, error)
-	// 字段名行号
-	FieldNameIndex int
-	// 字段类型行号
-	FieldTypeIndex int
-	// 字段注释行号
-	FieldCommentIndex int
-	// 字段装饰器行号
-	FieldDecoratorIndex int
-	// 主体数据开始行号
-	BodyStartIndex int
-	// 全部字段名行号
-	FieldNameIndexList []int
 }
 
 var (
@@ -64,13 +54,9 @@ func NewParser(path string, schemaName string, records [][]string) (IParser, err
 				Decorators: make([]entities.ITableDecorator, 0),
 				Records:    records,
 			},
-			NewTypeFunc:         entities.NewType,
-			FieldNameIndex:      config.GetSchemaFieldNameIndex(schemaName),
-			FieldTypeIndex:      config.GetFieldTypeIndex(),
-			FieldDecoratorIndex: config.GetFieldDecoratorIndex(),
-			FieldCommentIndex:   config.GetFieldCommentIndex(),
-			BodyStartIndex:      config.GetBodyStartIndex(),
-			FieldNameIndexList:  config.GetFieldNameIndexList(),
+			TomlConfig:  &config.Config,
+			schemaName:  schemaName,
+			NewTypeFunc: entities.NewType,
 		}
 
 		return parser(p), nil
@@ -81,14 +67,18 @@ func NewParser(path string, schemaName string, records [][]string) (IParser, err
 func CloneParser(schemaName string, tbl *entities.Table) (IParser, error) {
 	if parser, ok := parserRegistry[schemaName]; ok {
 		p := &Parser{
-			Table:               tbl,
-			NewTypeFunc:         entities.NewType,
-			FieldNameIndex:      config.GetSchemaFieldNameIndex(schemaName),
-			FieldTypeIndex:      config.GetFieldTypeIndex(),
-			FieldDecoratorIndex: config.GetFieldDecoratorIndex(),
-			FieldCommentIndex:   config.GetFieldCommentIndex(),
-			BodyStartIndex:      config.GetBodyStartIndex(),
-			FieldNameIndexList:  config.GetFieldNameIndexList(),
+			Table: &entities.Table{
+				Path:       tbl.Path,
+				Filename:   tbl.Filename,
+				Name:       tbl.Name,
+				Decorators: tbl.Decorators,
+				DataSetLen: tbl.DataSetLen,
+				DataSet:    tbl.DataSet,
+				Records:    tbl.Records,
+			},
+			TomlConfig:  &config.Config,
+			schemaName:  schemaName,
+			NewTypeFunc: entities.NewType,
 		}
 
 		iParser := parser(p)
@@ -134,7 +124,8 @@ func (p *Parser) Parse() error {
 
 // ParseFieldName 解析字段名
 func (p *Parser) ParseFieldName() error {
-	fieldNameRow := p.Records[p.FieldNameIndex]
+	fieldNameIndex := p.GetSchemaFieldNameIndex(p.schemaName)
+	fieldNameRow := p.Records[fieldNameIndex]
 	p.Fields = make([]*entities.Field, len(fieldNameRow))
 
 	// 检查是否有重复字段名
@@ -148,7 +139,7 @@ func (p *Parser) ParseFieldName() error {
 			field := &entities.Field{Column: column, Name: fieldName, Decorators: make(map[string]entities.IFieldDecorator)}
 			p.Fields[column] = field
 		} else {
-			return fmt.Errorf("单元格：%s、%s\n错误：%s 重复定义", util.ToCell(p.FieldNameIndex, column), util.ToCell(p.FieldNameIndex, column), fieldName)
+			return fmt.Errorf("单元格：%s、%s\n错误：%s 重复定义", util.ToCell(fieldNameIndex, column), util.ToCell(fieldNameIndex, column), fieldName)
 		}
 	}
 	p.FieldLen = len(fieldSet)
@@ -157,20 +148,20 @@ func (p *Parser) ParseFieldName() error {
 
 // ParseFieldType 解析字段类型
 func (p *Parser) ParseFieldType() error {
-	fieldTypeRow := p.Records[p.FieldTypeIndex]
+	fieldTypeRow := p.Records[p.GetFieldTypeIndex()]
 
 	for _, field := range p.Fields {
 		if fieldType := strings.ReplaceAll(fieldTypeRow[field.Column], " ", ""); fieldType != "" {
 			t, err := p.NewTypeFunc(fieldType, field)
 			if err != nil {
-				return fmt.Errorf("单元格：%s\n错误：%s", util.ToCell(p.FieldTypeIndex, field.Column), err)
+				return fmt.Errorf("单元格：%s\n错误：%s", util.ToCell(p.GetFieldTypeIndex(), field.Column), err)
 			}
 			field.Type = t
 		} else {
 			// 检查是否有字段存在但未填写类型的情况
-			for _, rowIndex := range p.FieldNameIndexList {
+			for _, rowIndex := range p.GetFieldNameIndexList() {
 				if p.Records[rowIndex][field.Column] != "" {
-					return fmt.Errorf("单元格：%s\n错误：类型不能为空", util.ToCell(p.FieldTypeIndex, field.Column))
+					return fmt.Errorf("单元格：%s\n错误：类型不能为空", util.ToCell(p.GetFieldTypeIndex(), field.Column))
 				}
 			}
 		}
@@ -180,7 +171,7 @@ func (p *Parser) ParseFieldType() error {
 
 // ParseFieldDecorators 解析装饰器信息
 func (p *Parser) ParseFieldDecorators() error {
-	fieldDecoratorRow := p.Records[p.FieldDecoratorIndex]
+	fieldDecoratorRow := p.Records[p.GetFieldDecoratorIndex()]
 	if fieldDecoratorRow == nil {
 		return nil
 	}
@@ -210,7 +201,7 @@ func (p *Parser) ParseFieldDecorators() error {
 
 // ParseFieldComment 解析字段注释
 func (p *Parser) ParseFieldComment() {
-	fileCommentRow := p.Records[p.FieldCommentIndex]
+	fileCommentRow := p.Records[p.GetFieldCommentIndex()]
 	for _, field := range p.Fields {
 		if len(fileCommentRow) > field.Column {
 			field.Comment = util.Quoted(strings.TrimSpace(fileCommentRow[field.Column]))
@@ -222,14 +213,14 @@ func (p *Parser) ParseFieldComment() {
 func (p *Parser) ParseFieldDefaultValue() {
 	for _, field := range p.Fields {
 		if field.Type != nil {
-			field.DefaultValue = field.Type.DefaultValue()
+			field.DefaultValue = field.Type.DefaultValueStr()
 		}
 	}
 }
 
 // ParseRow 解析行
 func (p *Parser) ParseRow() error {
-	records := p.Records[p.BodyStartIndex:]
+	records := p.Records[p.GetBodyStartIndex():]
 
 	// 初始化数据
 	totalRows, rowLength := len(records), len(p.Fields)
@@ -246,7 +237,7 @@ func (p *Parser) ParseRow() error {
 				if cell := strings.TrimSpace(row[field.Column]); cell != "" && field.Type != nil {
 					value, err := field.Type.ParseString(cell)
 					if err != nil {
-						return fmt.Errorf("单元格：%s\n错误：%s", util.ToCell(rowIndex+p.BodyStartIndex, field.Column), err)
+						return fmt.Errorf("单元格：%s\n错误：%s", util.ToCell(rowIndex+p.GetBodyStartIndex(), field.Column), err)
 					}
 					p.DataSet[rowIndex][field.Column] = value
 				}

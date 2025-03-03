@@ -5,7 +5,7 @@ import (
 )
 
 type TSMap struct {
-	entities.ITypeSystem
+	*entities.Map
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &TSMap{ITypeSystem: mapType}, nil
+	return &TSMap{Map: mapType.(*entities.Map)}, nil
 }
 
 func (*TSMap) Convert(val any) string {
@@ -25,13 +25,17 @@ func (*TSMap) Convert(val any) string {
 }
 
 func (m *TSMap) String() string {
-	return "any"
+	return "Map<any, any> | null"
 }
 
-func (*TSMap) DefaultValue() string {
+func (*TSMap) DefaultValueStr() string {
 	return "new Map()"
 }
 
-func (*TSMap) Decorator() string {
+func (*TSMap) DecoratorStr() string {
 	return "@cacheObjRes()"
+}
+
+func (*TSMap) IsReferenceType() bool {
+	return true
 }

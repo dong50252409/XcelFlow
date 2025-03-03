@@ -1,107 +1,115 @@
 package typescript
 
-const headTemplate = `
-{{- define "head" -}}
-import * as flatbuffers from '../../../../Plugins/FlatBuffers';
-import { BaseData_Fbs } from '../../BaseData';
-import { cacheObjRes, cacheStrRes, FbsData, FbsDataList } from '../../FbsDataListView';
-import { {{ .Table.ConfigName | toUpperCamelCase }} } from '../FbsCls/{{ .Table.Name | toKebabCase }}';
-import { {{ .Table.ConfigName | toUpperCamelCase }}List } from '../FbsCls/{{ .Table.Name | toKebabCase }}-list';
-{{- end -}}
-`
+const headTemplate = `{{- define "IMPORT_TEMPLATE" -}}
+import {flatbuffers, flexbuffers, BaseData_Fbs, cacheObjRes, FbsData, FbsDataList } from './index'
+{{- end -}}`
 
-const baseClassTemplate = `
-{{- define "base_class" -}}
-export class {{ .Table.Name | toUpperCamelCase }} extends BaseData_Fbs<Cfg{{ .Table.Name | toUpperCamelCase }}> {
-    public getFbsDataList(data: ArrayBuffer): FbsDataList<{{ .Table.InnerConfigName }}> {
-        return new {{ .Table.InnerConfigName }}List(data);
+const baseClassTemplate = `{{- define "BASE_CLASS_TEMPLATE" -}}
+{{- $configName := .Table.ConfigName | toUpperCamelCase -}}
+{{- $pkFields := .Table.GetPrimaryKeyFields -}}
+{{- $pkLastIndex := len $pkFields | add -1 -}}
+export class {{ $configName }} extends BaseData_Fbs<Cfg{{ $configName }}> {
+    protected _keys: string[] = [{{- range $pkIndex, $pkField := $pkFields -}}'{{ $pkField.Name | toLowerCamelCase }}'{{ if lt $pkIndex $pkLastIndex }}, {{ end }}{{ end }}];
+
+    public getFbsDataList(data: ArrayBuffer): FbsDataList<Cfg{{ $configName }}> {
+        return new Cfg{{ $configName }}List(data);
     }
 
-	{{- $pkFields := .Table.GetPrimaryKeyFields }}
-	{{ $pkLen := $pkFields | len | add -1 }}
-    get({{ range $pkIndex, $pkField := $pkFields }}{{ $pkField.Name | toLowerCamelCase }}: {{ $pkField.Type }}{{ if lt $pkIndex $pkLen }}, {{ end }}{{ end }}): {{ .Table.InnerConfigName }} {
-	    return super.get({{ range $pkIndex, $pkField := $pkFields }}{{ $pkField.Name | toLowerCamelCase }}{{ if lt $pkIndex $pkLen }}, {{ end }}{{ end }});
+    public get({{- range $pkIndex, $pkField := $pkFields -}}{{ $pkField.Name | toLowerCamelCase }}: {{ $pkField.Type }}{{ if lt $pkIndex $pkLastIndex }}, {{ end }}{{ end }}): Cfg{{ .Table.ConfigName | toUpperCamelCase }} {
+        return super.get({{- range $pkIndex, $pkField := $pkFields -}}{{ $pkField.Name | toLowerCamelCase }}{{ if lt $pkIndex $pkLastIndex }}, {{ end }}{{ end }});
     }
 }
-{{- end -}}
-`
+{{- end -}}`
 
-const innerClass1Template = `
-{{- define "inner_class1" -}}
-export class {{ .Table.InnerConfigName }} extends FbsData {
-    private _fbs: {{ .Table.ConfigName | toUpperCamelCase }};
+const listClassTemplate = `{{- define "LIST_CLASS_TEMPLATE" -}}
+{{- $configName := .Table.ConfigName | toUpperCamelCase -}}
+export class Cfg{{ $configName }}List extends FbsDataList<Cfg{{ $configName }}> {
+    private bb: flatbuffers.ByteBuffer | null = null;
+    private bb_pos = 0;
 
-    __init(fbs: {{ .Table.ConfigName | toUpperCamelCase }}) {
-		this._fbs = fbs;
+    __init(data: ArrayBuffer) {
+        const bb = new flatbuffers.ByteBuffer(new Uint8Array(data));
+        this.bb_pos = bb.readInt32(bb.position()) + bb.position();
+        this.bb = bb;
     }
 
-    public clone(): {{ .Table.InnerConfigName }} {
-	    let newFD: {{ .Table.InnerConfigName }} = new {{ .Table.InnerConfigName }}();
-	    newFD._fbs = new {{ .Table.ConfigName | toUpperCamelCase }}();
-        newFD._fbs.bb = this._fbs.bb;
-        newFD._fbs.bb_pos = this._fbs.bb_pos;
-	    return newFD;
+    public get length(): number {
+        const offset = this.bb!.__offset(this.bb_pos, 4);
+        return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
     }
 
-	{{- $pkFields := .Table.GetPrimaryKeyFields }}
-	{{ $pkLen := $pkFields | len | add -1 }}
-    public checkKeyPrefix(): string{
-        return {{ "\x60" }}{{ .Table.InnerConfigName }}.{{ range $pkIndex, $pkField := $pkFields }}${this.{{ $pkField.Name | toLowerCamelCase }}}{{ if lt $pkIndex $pkLen }}.{{ end }}{{ end }}{{ "\x60" }};
+    public getFbsData(index: number, obj?: Cfg{{ $configName }}): Cfg{{ $configName }} | null {
+        const offset = this.bb!.__offset(this.bb_pos, 4);
+        obj = obj || new Cfg{{ $configName }}();
+        return offset ? obj.__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : obj;
+    }
+}
+{{- end -}}`
+
+const classTemplate = `{{- define "CLASS_TEMPLATE" -}}
+{{- $configName := .Table.ConfigName | toUpperCamelCase -}}
+export class Cfg{{ $configName }} extends FbsData {
+    private bb: flatbuffers.ByteBuffer | null = null;
+    private bb_pos = 0;
+
+    __init(i: number, bb: flatbuffers.ByteBuffer): Cfg{{ $configName }} {
+        this.bb_pos = i;
+        this.bb = bb;
+        return this;
+    }
+
+    __toObject(i: number): unknown {
+        const offset = this.bb!.__offset(this.bb_pos, i);
+        if (offset) {
+            const array = new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset));
+            return flexbuffers.toObject(array.slice().buffer);
+        }
+        return null
+    }
+
+    public clone(): Cfg{{ $configName }} {
+        let obj = new Cfg{{ $configName }}();
+        if (this.bb) {
+            obj.__init(this.bb_pos, this.bb!);
+        }
+        return obj;
     }
 
     {{ range $index, $field := .Table.FieldRowIter }}
-	{{ $field.Type.Decorator }}
-	public get {{ $field.Name | toLowerCamelCase }}(): {{ $field.Type }} {
-		return this._fbs.{{ $field.Name | toLowerCamelCase }}();
-	}
+    {{- $decorator := $field.Type.DecoratorStr }}
+    {{- if $decorator }}
+    {{ $decorator }}
+    {{- end }}
+    public get {{ $field.Name | toLowerCamelCase }}(): {{ $field.Type }} {
+        {{- if $field.Type.IsReferenceType }}
+        return this.__toObject({{ $index | calOffset }}) as {{ $field.Type }}
+        {{- else }}
+        const offset = this.bb!.__offset(this.bb_pos, {{ $index | calOffset }});
+        return offset ? this.bb!.{{ $field.Type.MethodStr }}(this.bb_pos + offset) : {{ $field.Type.DefaultValueStr }};
+        {{- end }}
+    }
     {{ end }}
 }
-{{- end -}}
-`
-const innerClass2Template = `
-{{- define "inner_class2" -}}
-export class {{ .Table.InnerConfigName }}List extends FbsDataList<{{ .Table.InnerConfigName }}> {
-	private _fbsList: {{ .Table.ConfigName | toUpperCamelCase }}List;
+{{- end -}}`
 
-	__init(data: ArrayBuffer) {
-		this._fbsList = {{ .Table.ConfigName | toUpperCamelCase }}List.getRootAs{{ .Table.ConfigName | toUpperCamelCase }}List(new flatbuffers.ByteBuffer(new Uint8Array(data)));
-	}
-
-    public get length(): number {
-        return this._fbsList.{{ .Table.Name | toLowerCamelCase }}Length();
-    }
-
-    public getFbsData(index: number, obj?: {{ .Table.InnerConfigName | toUpperCamelCase }}): {{ .Table.InnerConfigName | toUpperCamelCase }} {
-        obj = obj ? obj : new {{ .Table.InnerConfigName | toUpperCamelCase }}();
-        obj.__init(this._fbsList.{{ .Table.Name | toLowerCamelCase }}(index) as {{ .Table.ConfigName | toUpperCamelCase}});
-        return obj;
-    }
-}
-{{- end -}}
-`
-
-const enumTemplate = `
-{{- define "enum" -}}
+const enumTemplate = `{{- define "ENUM_TEMPLATE" -}}
 {{ range $_, $macro := .Table.GetMacroDecorators }}
 // {{ $macro.KeyField.Comment }}
 export enum {{ $macro.MacroName | toUpperCamelCase }}Enum { 
 	{{- range $_, $macroDetail := $macro.List }}
     /** {{ $macroDetail.Comment }} */
-    {{ $macroDetail.Key | $macro.KeyField.Type.Convert | toUpperSnakeCase }} = {{ $macroDetail.Value | $macro.ValueField.Type.Convert }},
+    {{ $macroDetail.Key | toUpperSnakeCase }} = {{ $macroDetail.Value | $macro.ValueField.Type.Convert }},
 	{{- end }}
 }
 {{ end }}
-{{- end -}}
-`
+{{- end -}}`
 
-const tsTemplate = `
-{{- template "head" .}}
+const tsTemplate = `{{- template "IMPORT_TEMPLATE" .}}
 
-{{ template "base_class" .}}
+{{ template "BASE_CLASS_TEMPLATE" .}}
 
-{{ template "inner_class1" .}}
+{{ template "LIST_CLASS_TEMPLATE" .}}
 
-{{ template "inner_class2" .}}
+{{ template "CLASS_TEMPLATE" .}}
 
-{{ template "enum" . -}}
-`
+{{ template "ENUM_TEMPLATE" . -}}`

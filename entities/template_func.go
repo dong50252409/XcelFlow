@@ -1,9 +1,10 @@
 package entities
 
 import (
-	"github.com/stoewer/go-strcase"
 	"strings"
 	"text/template"
+
+	"github.com/stoewer/go-strcase"
 )
 
 var FuncMap = template.FuncMap{
@@ -18,6 +19,15 @@ var FuncMap = template.FuncMap{
 	"add":              Add,
 	"seq":              Seq,
 	"joinByComma":      JoinByComma,
+}
+
+// CloneFuncMap 深拷贝
+func CloneFuncMap() template.FuncMap {
+	funcMap := make(template.FuncMap)
+	for k, v := range FuncMap {
+		funcMap[k] = v
+	}
+	return funcMap
 }
 
 // Add 两个数相加

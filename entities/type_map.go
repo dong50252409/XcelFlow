@@ -79,7 +79,7 @@ func (m *Map) String() string {
 	return "map"
 }
 
-func (m *Map) DefaultValue() string {
+func (m *Map) DefaultValueStr() string {
 	return "{}"
 }
 
@@ -102,4 +102,16 @@ func (m *Map) CheckFunc() func(any) bool {
 		}
 		return true
 	}
+}
+
+func (m *Map) DecoratorStr() string {
+	return ""
+}
+
+func (m *Map) IsReferenceType() bool {
+	return true
+}
+
+func (m *Map) MethodStr() string {
+	return ""
 }

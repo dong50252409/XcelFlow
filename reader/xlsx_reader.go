@@ -67,7 +67,7 @@ func (r *XLSXReader) Read() ([][]string, error) {
 		}
 	}
 
-	if records == nil || len(records) == 0 {
+	if len(records) == 0 {
 		return nil, errorTableNotSheet(r.Path)
 	}
 
@@ -90,7 +90,7 @@ func (r *XLSXReader) createHeadMap(records *[][]string, tempRecords *[][]string,
 
 // 对齐表头
 func (r *XLSXReader) alignHead(records *[][]string) {
-	headRows := (*records)[:r.BodyStartIndex] // 前五行
+	headRows := (*records)[:r.GetBodyStartIndex()] // 前五行
 	// 获取最大列数
 	maxColNum := 0
 	for _, row := range headRows {
@@ -110,14 +110,14 @@ func (r *XLSXReader) alignHead(records *[][]string) {
 func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[entities.TupleT]int, map[entities.TupleT]int, error) {
 	headMap := make(map[entities.TupleT]int)
 	fieldNameMap := make(map[entities.TupleT]int)
-	headRows := (*records)[:r.BodyStartIndex] // 前五行
-	fieldNameRorNum := len(r.FieldNameIndexList)
+	headRows := (*records)[:r.GetBodyStartIndex()] // 前五行
+	fieldNameRorNum := len(r.GetFieldNameIndexList())
 
 	// 获取表头列信息
 	for colIndex := 0; colIndex < len(headRows[0]); colIndex++ {
 		fullKey := entities.TupleT{}
 		isEmptyCol := true
-		for rowIndex := 0; rowIndex < r.BodyStartIndex; rowIndex++ {
+		for rowIndex := 0; rowIndex < r.GetBodyStartIndex(); rowIndex++ {
 			cell := headRows[rowIndex][colIndex]
 			if cell != "" {
 				isEmptyCol = false
@@ -127,19 +127,19 @@ func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[ent
 
 		// 字段名+类型
 		fnKey := entities.TupleT{}
-		for index, rowIndex := range r.FieldNameIndexList {
+		for index, rowIndex := range r.GetFieldNameIndexList() {
 			if cell := headRows[rowIndex][colIndex]; cell != "" {
 				fnKey[index] = cell
 			}
 		}
-		fnKey[fieldNameRorNum] = headRows[r.FieldTypeIndex][colIndex]
+		fnKey[fieldNameRorNum] = headRows[r.GetFieldTypeIndex()][colIndex]
 
 		if isEmptyCol {
 			fmt.Printf("页签：%s 单元格：%s 存在空表头，多页签数据合并可能无法正确进行，建议至少添加一个表头数据或删除此列\n", sheetName, util.ToCell(0, colIndex))
 		} else if _, ok := headMap[fullKey]; ok {
-			return nil, nil, fmt.Errorf("页签：%s 单元格：%s 存在重复表头\n", sheetName, util.ToCell(0, colIndex))
+			return nil, nil, errorTableSheetHeadRepeat(sheetName, colIndex)
 		} else if _, ok := fieldNameMap[fnKey]; ok {
-			return nil, nil, fmt.Errorf("页签：%s 单元格：%s 存在重复表头\n", sheetName, util.ToCell(0, colIndex))
+			return nil, nil, errorTableSheetHeadRepeat(sheetName, colIndex)
 		} else {
 			headMap[fullKey] = colIndex
 			fieldNameMap[fnKey] = colIndex
@@ -166,24 +166,24 @@ func (r *XLSXReader) mergeRecords(p headPair, records *[][]string, newRecords *[
 	// 扩充records
 	maxColNum := len(p.headList1)
 	maxRowNum := len(*records)
-	extendNum := len(*newRecords) - r.BodyStartIndex
+	extendNum := len(*newRecords) - r.GetBodyStartIndex()
 	for i := 0; i < extendNum; i++ {
 		*records = append(*records, make([]string, maxColNum))
 	}
 
-	headRows := (*records)[:r.BodyStartIndex]
+	headRows := (*records)[:r.GetBodyStartIndex()]
 	bodyRows := (*records)[maxRowNum:]
 	for index, e := range p.headList2 {
 		if colIndex, ok := p.headMap1[e.key]; ok {
 			// 总sheet表中有新sheet表中的字段
-			for rowIndex, row := range (*newRecords)[r.BodyStartIndex:] {
+			for rowIndex, row := range (*newRecords)[r.GetBodyStartIndex():] {
 				if len(row) > index {
 					bodyRows[rowIndex][colIndex] = row[index]
 				}
 			}
 		} else if colIndex = fuzzyIndex(p.fieldNameList2[index], p.fieldNameMap1); colIndex != -1 {
 			// 总sheet表中有新sheet表中的字段
-			for rowIndex, row := range (*newRecords)[r.BodyStartIndex:] {
+			for rowIndex, row := range (*newRecords)[r.GetBodyStartIndex():] {
 				if len(row) > index {
 					bodyRows[rowIndex][colIndex] = row[index]
 				}
@@ -195,7 +195,7 @@ func (r *XLSXReader) mergeRecords(p headPair, records *[][]string, newRecords *[
 				headRows[rowIndex] = append(headRows[rowIndex], (*newRecords)[rowIndex][e.index])
 			}
 			// 追加数据
-			for rowIndex, row := range (*newRecords)[r.BodyStartIndex:] {
+			for rowIndex, row := range (*newRecords)[r.GetBodyStartIndex():] {
 				if len(row) > index {
 					bodyRows[rowIndex] = append(bodyRows[rowIndex], row[index])
 				}

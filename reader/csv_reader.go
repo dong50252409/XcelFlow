@@ -30,7 +30,7 @@ func (r *CSVReader) Read() ([][]string, error) {
 		return nil, errorTableReadFailed(r.Path, err)
 	}
 
-	if records == nil || len(records) == 0 {
+	if len(records) == 0 {
 		return nil, errorTableNotSheet(r.Path)
 	}
 

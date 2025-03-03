@@ -6,7 +6,7 @@ import (
 )
 
 type FBTuple struct {
-	entities.ITypeSystem
+	*entities.Tuple
 }
 
 func init() {
@@ -18,11 +18,11 @@ func newTuple(typeStr string, field *entities.Field) (entities.ITypeSystem, erro
 	if err != nil {
 		return nil, err
 	}
-	return &FBTuple{ITypeSystem: tuple}, nil
+	return &FBTuple{tuple.(*entities.Tuple)}, nil
 }
 
 func (fbt *FBTuple) String() string {
-	t := fbt.ITypeSystem.(*entities.Tuple).T
+	t := fbt.T
 	switch t.(type) {
 	case *FBInteger:
 		return fmt.Sprintf("[%s]", t.(*FBInteger).String())
@@ -41,6 +41,6 @@ func (fbt *FBTuple) String() string {
 	}
 }
 
-func (*FBTuple) DefaultValue() string {
+func (*FBTuple) DefaultValueStr() string {
 	return "[]"
 }

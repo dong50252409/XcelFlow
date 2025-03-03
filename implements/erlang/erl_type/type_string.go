@@ -6,7 +6,7 @@ import (
 )
 
 type ErlStr struct {
-	entities.ITypeSystem
+	*entities.Str
 }
 
 func init() {
@@ -18,7 +18,7 @@ func newStr(typeStr string, field *entities.Field) (entities.ITypeSystem, error)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlStr{ITypeSystem: s}, nil
+	return &ErlStr{s.(*entities.Str)}, nil
 }
 
 func (s *ErlStr) Convert(val any) string {
@@ -29,6 +29,6 @@ func (s *ErlStr) String() string {
 	return "binary()"
 }
 
-func (s *ErlStr) DefaultValue() string {
+func (s *ErlStr) DefaultValueStr() string {
 	return "<<>>"
 }

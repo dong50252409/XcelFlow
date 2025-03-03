@@ -32,7 +32,7 @@ func (r *Any) String() string {
 	return "any"
 }
 
-func (r *Any) DefaultValue() string {
+func (r *Any) DefaultValueStr() string {
 	return "nil"
 }
 
@@ -49,4 +49,16 @@ func (r *Any) CheckFunc() func(any) bool {
 		}
 		return ok
 	}
+}
+
+func (r *Any) DecoratorStr() string {
+	return ""
+}
+
+func (r *Any) IsReferenceType() bool {
+	return true
+}
+
+func (r *Any) MethodStr() string {
+	return ""
 }

@@ -2,4 +2,3 @@
 *.exe
 *.xlsx
 *.csv
-!samples/flatbuffers/flatc.exe

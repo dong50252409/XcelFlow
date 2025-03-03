@@ -5,7 +5,7 @@ import (
 )
 
 type FBBoolean struct {
-	entities.ITypeSystem
+	*entities.Boolean
 }
 
 func init() {
@@ -17,7 +17,7 @@ func newBoolean(typeStr string, field *entities.Field) (entities.ITypeSystem, er
 	if err != nil {
 		return nil, err
 	}
-	return &FBBoolean{ITypeSystem: boolean}, nil
+	return &FBBoolean{boolean.(*entities.Boolean)}, nil
 }
 
 func (b *FBBoolean) String() string {
