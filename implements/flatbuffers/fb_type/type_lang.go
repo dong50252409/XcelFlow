@@ -1,23 +1,24 @@
 package fb_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type FBLang struct {
-	*entities.Lang
+	*types.Lang
 }
 
 func init() {
 	typeRegister("lang", newLang)
 }
 
-func newLang(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	lang, err := entities.NewLang(typeStr, field)
+func newLang(typeStr string) (core.IType, error) {
+	lang, err := types.NewLang(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &FBLang{lang.(*entities.Lang)}, nil
+	return &FBLang{Lang: lang.(*types.Lang)}, nil
 }
 
 func (l *FBLang) String() string {

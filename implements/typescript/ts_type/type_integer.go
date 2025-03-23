@@ -1,23 +1,24 @@
 package ts_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSInteger struct {
-	*entities.Integer
+	*types.Integer
 }
 
 func init() {
 	typeRegister("int", newInteger)
 }
 
-func newInteger(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	integer, err := entities.NewInteger(typeStr, field)
+func newInteger(typeStr string) (core.IType, error) {
+	integer, err := types.NewInteger(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSInteger{Integer: integer.(*entities.Integer)}, nil
+	return &TSInteger{Integer: integer.(*types.Integer)}, nil
 }
 
 func (i *TSInteger) String() string {

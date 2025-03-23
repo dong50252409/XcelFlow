@@ -2,23 +2,24 @@ package ts_type
 
 import (
 	"fmt"
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSAny struct {
-	*entities.Any
+	*types.Any
 }
 
 func init() {
 	typeRegister("any", newAny)
 }
 
-func newAny(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	anyValue, err := entities.NewAny(typeStr, field)
+func newAny(typeStr string) (core.IType, error) {
+	anyValue, err := types.NewAny(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSAny{Any: anyValue.(*entities.Any)}, nil
+	return &TSAny{Any: anyValue.(*types.Any)}, nil
 }
 
 func (s *TSAny) Convert(val any) string {

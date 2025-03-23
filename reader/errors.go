@@ -7,17 +7,11 @@ import (
 )
 
 var (
-	ErrorTableTempFile        error
 	ErrorTableNotSupported    error
 	ErrorTableReadFailed      error
 	ErrorTableNotSheet        error
 	ErrorTableSheetHeadRepeat error
 )
-
-func errorTableTempFile(path string) error {
-	ErrorTableTempFile = errors.New(fmt.Sprintf("无法读取临时文件！%s", path))
-	return ErrorTableTempFile
-}
 
 func errorTableNotSupported(path string) error {
 	ErrorTableNotSupported = errors.New(fmt.Sprintf("配置表不支持！%s", path))

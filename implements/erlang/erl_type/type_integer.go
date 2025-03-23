@@ -1,23 +1,24 @@
 package erl_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type ErlInteger struct {
-	*entities.Integer
+	*types.Integer
 }
 
 func init() {
 	typeRegister("int", newInteger)
 }
 
-func newInteger(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	integer, err := entities.NewInteger(typeStr, field)
+func newInteger(typeStr string) (core.IType, error) {
+	integer, err := types.NewInteger(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlInteger{integer.(*entities.Integer)}, nil
+	return &ErlInteger{Integer: integer.(*types.Integer)}, nil
 }
 
 func (i *ErlInteger) String() string {

@@ -1,21 +1,22 @@
 package fb_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type FBFloat struct {
-	*entities.Float
+	*types.Float
 }
 
 func init() {
 	typeRegister("float", newFloat)
 }
 
-func newFloat(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	float, err := entities.NewFloat(typeStr, field)
+func newFloat(typeStr string) (core.IType, error) {
+	float, err := types.NewFloat(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &FBFloat{float.(*entities.Float)}, nil
+	return &FBFloat{Float: float.(*types.Float)}, nil
 }

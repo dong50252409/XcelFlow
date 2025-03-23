@@ -1,23 +1,24 @@
 package erl_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type ErlTuple struct {
-	*entities.Tuple
+	*types.Tuple
 }
 
 func init() {
 	typeRegister("tuple", newTuple)
 }
 
-func newTuple(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	tuple, err := entities.NewTuple(typeStr, field)
+func newTuple(typeStr string) (core.IType, error) {
+	tuple, err := types.NewTuple(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlTuple{tuple.(*entities.Tuple)}, nil
+	return &ErlTuple{Tuple: tuple.(*types.Tuple)}, nil
 }
 
 func (*ErlTuple) Convert(val any) string {
@@ -26,8 +27,4 @@ func (*ErlTuple) Convert(val any) string {
 
 func (*ErlTuple) String() string {
 	return "tuple()"
-}
-
-func (*ErlTuple) DefaultValueStr() string {
-	return "{}"
 }

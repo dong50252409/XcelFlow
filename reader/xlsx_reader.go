@@ -2,11 +2,12 @@ package reader
 
 import (
 	"fmt"
-	"github.com/xuri/excelize/v2"
 	"path/filepath"
 	"sort"
-	"xCelFlow/entities"
+	"xCelFlow/core"
 	"xCelFlow/util"
+
+	"github.com/xuri/excelize/v2"
 )
 
 type XLSXReader struct {
@@ -14,16 +15,16 @@ type XLSXReader struct {
 }
 
 type headPair struct {
-	headMap1       map[entities.TupleT]int
+	headMap1       map[core.TupleT]int
 	headList1      []keyIndex
-	fieldNameMap1  map[entities.TupleT]int
-	headMap2       map[entities.TupleT]int
+	fieldNameMap1  map[core.TupleT]int
+	headMap2       map[core.TupleT]int
 	headList2      []keyIndex
 	fieldNameList2 []keyIndex
 }
 
 type keyIndex struct {
-	key   entities.TupleT
+	key   core.TupleT
 	index int
 }
 
@@ -31,7 +32,7 @@ func init() {
 	Register("xlsx", newXLSXReader)
 }
 
-func newXLSXReader(reader *Reader) IReader {
+func newXLSXReader(reader *Reader) core.IReader {
 	return &XLSXReader{reader}
 }
 
@@ -45,13 +46,10 @@ func (r *XLSXReader) Read() ([][]string, error) {
 
 	var records [][]string
 	filename := filepath.Base(r.Path)
-	tableName, err := util.SubTableName(filename)
-	if err != nil {
-		return nil, errorTableReadFailed(r.Path, err)
-	}
+	tableName := util.SubTableName(filename)
 
 	for _, sheetName := range file.GetSheetList() {
-		if name, _ := util.SubTableName(sheetName); tableName == name {
+		if name := util.SubTableName(sheetName); tableName == name {
 			if tempRecords, err := file.GetRows(sheetName); err != nil {
 				return nil, errorTableReadFailed(r.Path, err)
 			} else {
@@ -107,15 +105,15 @@ func (r *XLSXReader) alignHead(records *[][]string) {
 }
 
 // initHeadMap 获取表头列信息
-func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[entities.TupleT]int, map[entities.TupleT]int, error) {
-	headMap := make(map[entities.TupleT]int)
-	fieldNameMap := make(map[entities.TupleT]int)
+func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[core.TupleT]int, map[core.TupleT]int, error) {
+	headMap := make(map[core.TupleT]int)
+	fieldNameMap := make(map[core.TupleT]int)
 	headRows := (*records)[:r.GetBodyStartIndex()] // 前五行
 	fieldNameRorNum := len(r.GetFieldNameIndexList())
 
 	// 获取表头列信息
 	for colIndex := 0; colIndex < len(headRows[0]); colIndex++ {
-		fullKey := entities.TupleT{}
+		fullKey := core.TupleT{}
 		isEmptyCol := true
 		for rowIndex := 0; rowIndex < r.GetBodyStartIndex(); rowIndex++ {
 			cell := headRows[rowIndex][colIndex]
@@ -126,7 +124,7 @@ func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[ent
 		}
 
 		// 字段名+类型
-		fnKey := entities.TupleT{}
+		fnKey := core.TupleT{}
 		for index, rowIndex := range r.GetFieldNameIndexList() {
 			if cell := headRows[rowIndex][colIndex]; cell != "" {
 				fnKey[index] = cell
@@ -150,7 +148,7 @@ func (r *XLSXReader) initHeadMap(records *[][]string, sheetName string) (map[ent
 }
 
 // initHeadList 获取表头列信息
-func initHeadList(headMap map[entities.TupleT]int) []keyIndex {
+func initHeadList(headMap map[core.TupleT]int) []keyIndex {
 	headList := make([]keyIndex, 0, len(headMap))
 	for k, v := range headMap {
 		headList = append(headList, keyIndex{k, v})
@@ -204,7 +202,7 @@ func (r *XLSXReader) mergeRecords(p headPair, records *[][]string, newRecords *[
 	}
 }
 
-func fuzzyIndex(e keyIndex, fieldNameMap map[entities.TupleT]int) int {
+func fuzzyIndex(e keyIndex, fieldNameMap map[core.TupleT]int) int {
 	if index, ok := fieldNameMap[e.key]; ok {
 		return index
 	}

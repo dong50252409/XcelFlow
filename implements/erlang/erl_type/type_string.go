@@ -2,23 +2,24 @@ package erl_type
 
 import (
 	"fmt"
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type ErlStr struct {
-	*entities.Str
+	*types.Str
 }
 
 func init() {
 	typeRegister("str", newStr)
 }
 
-func newStr(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	s, err := entities.NewStr(typeStr, field)
+func newStr(typeStr string) (core.IType, error) {
+	s, err := types.NewStr(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlStr{s.(*entities.Str)}, nil
+	return &ErlStr{Str: s.(*types.Str)}, nil
 }
 
 func (s *ErlStr) Convert(val any) string {
@@ -27,8 +28,4 @@ func (s *ErlStr) Convert(val any) string {
 
 func (s *ErlStr) String() string {
 	return "binary()"
-}
-
-func (s *ErlStr) DefaultValueStr() string {
-	return "<<>>"
 }

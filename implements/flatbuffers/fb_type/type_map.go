@@ -1,29 +1,26 @@
 package fb_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type FBMap struct {
-	*entities.Map
+	*types.Map
 }
 
 func init() {
 	typeRegister("map", newMap)
 }
 
-func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	mapType, err := entities.NewMap(typeStr, field)
+func newMap(typeStr string) (core.IType, error) {
+	mapType, err := types.NewMap(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &FBMap{mapType.(*entities.Map)}, nil
+	return &FBMap{Map: mapType.(*types.Map)}, nil
 }
 
 func (m *FBMap) String() string {
 	return "[ubyte](flexbuffer)"
-}
-
-func (*FBMap) DefaultValueStr() string {
-	return "[]"
 }

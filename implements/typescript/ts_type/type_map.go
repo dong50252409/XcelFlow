@@ -1,23 +1,24 @@
 package ts_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSMap struct {
-	*entities.Map
+	*types.Map
 }
 
 func init() {
 	typeRegister("map", newMap)
 }
 
-func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	mapType, err := entities.NewMap(typeStr, field)
+func newMap(typeStr string) (core.IType, error) {
+	mapType, err := types.NewMap(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSMap{Map: mapType.(*entities.Map)}, nil
+	return &TSMap{Map: mapType.(*types.Map)}, nil
 }
 
 func (*TSMap) Convert(val any) string {
@@ -26,10 +27,6 @@ func (*TSMap) Convert(val any) string {
 
 func (m *TSMap) String() string {
 	return "Map<any, any> | null"
-}
-
-func (*TSMap) DefaultValueStr() string {
-	return "new Map()"
 }
 
 func (*TSMap) DecoratorStr() string {

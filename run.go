@@ -1,103 +1,100 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"xCelFlow/config"
-	"xCelFlow/entities"
-	_ "xCelFlow/implements/erlang"
-	_ "xCelFlow/implements/flatbuffers"
-	_ "xCelFlow/implements/json"
-	_ "xCelFlow/implements/typescript"
+	"xCelFlow/core"
 	"xCelFlow/parser"
 	"xCelFlow/reader"
 	"xCelFlow/render"
+	"xCelFlow/util"
+
+	_ "xCelFlow/implements/erlang"
+
+	_ "xCelFlow/implements/flatbuffers"
+
+	_ "xCelFlow/implements/json"
+
+	_ "xCelFlow/implements/typescript"
 )
 
-func run(path string, schemaName string) error {
-	records, err := readFile(path)
+func Run(path string, schemaName string) error {
+	filename := filepath.Base(path)
+	if tableName := util.SubTableName(filename); tableName == "" {
+		panic(fmt.Sprintf("文件名：%s 文件名格式错误 格式：配表描述(表名)", filename))
+	}
+
+	// 跳过临时文件
+	if strings.HasPrefix(filepath.Base(path), "~$") {
+		return nil
+	}
+
+	records, err := ReadFile(path)
 	if err != nil {
-		if errors.Is(err, reader.ErrorTableTempFile) {
-			return nil
-		}
+		return err
+	}
+	tbl := core.NewTable(path, records)
+	p, err := Parser(schemaName, tbl)
+	if err != nil {
 		return err
 	}
 
-	t, err := parserTable(path, schemaName, records)
-	if err != nil {
-		return err
-	}
-
-	err = renderTable(schemaName, t)
-	if err != nil {
+	if err = RenderTable(schemaName, p.GetTable()); err != nil {
 		return err
 	}
 	return nil
 }
 
-func readFile(path string) ([][]string, error) {
+func ReadFile(path string) ([][]string, error) {
 	fmt.Printf("读取配置文件：%s\n", path)
-
 	r, err := reader.NewReader(path)
 	if err != nil {
 		return nil, err
 	}
+
 	records, err := r.Read()
 	if err != nil {
 		return nil, err
 	}
+
 	return records, nil
 }
 
-func parserTable(path string, schemaName string, records [][]string) (*entities.Table, error) {
-	p, err := parser.NewParser(path, schemaName, records)
+func Parser(schemaName string, tbl *core.Table) (core.IParser, error) {
+	p, err := parser.NewParser(schemaName, tbl)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = p.ParseFieldName(); err != nil {
+	if err = p.Parse(); err != nil {
 		return nil, err
 	}
 
-	if err = p.ParseFieldType(); err != nil {
-		return nil, err
-	}
-
-	if err = p.ParseFieldDecorators(); err != nil {
-		return nil, err
-	}
-
-	p.ParseFieldComment()
-
-	if err = p.ParseRow(); err != nil {
-		return nil, err
-	}
-
-	p.ParseFieldDefaultValue()
-
-	if err = p.RunDecorators(); err != nil {
-		return nil, err
-	}
-
-	return p.GetTable(), nil
+	return p, nil
 }
 
-func renderTable(schemaName string, t *entities.Table) error {
-	if r, err := render.NewRender(schemaName, t); err != nil {
+func RenderTable(schemaName string, tbl *core.Table) error {
+	r, err := render.NewRender(schemaName, tbl)
+	if err != nil {
 		return err
-	} else if r != nil {
-		if err = r.Execute(); err != nil {
+	}
+
+	if r == nil {
+		return nil
+	}
+
+	if err = r.Execute(); err != nil {
+		return err
+	}
+
+	if config.Config.GetVerify() {
+		if err = r.Verify(); err != nil {
 			return err
 		}
-		if config.Config.GetVerify() {
-			if err = r.Verify(); err != nil {
-				return err
-			}
-		}
 	}
-	fmt.Printf("导出配置完成：%s\n", t.Filename)
 	return nil
 }
 

@@ -7,13 +7,13 @@ import (
 )
 
 // SubTableName 获取表名
-func SubTableName(filename string) (string, error) {
+func SubTableName(filename string) string {
 	index := strings.Index(filename, "(")
 	lastIndex := strings.LastIndex(filename, ")")
 	if index == -1 || lastIndex == -1 {
-		return "", fmt.Errorf("文件名格式错误 配表描述(表名).ext")
+		return ""
 	}
-	return filename[strings.Index(filename, "(")+1 : strings.LastIndex(filename, ")")], nil
+	return filename[index+1 : lastIndex]
 }
 
 // GetKey 获取key以及未解析的参数

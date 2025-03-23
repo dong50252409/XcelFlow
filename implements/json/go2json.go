@@ -3,7 +3,7 @@ package json
 import (
 	"fmt"
 	"strconv"
-	"xCelFlow/entities"
+	"xCelFlow/core"
 )
 
 func convert(data any) any {
@@ -17,7 +17,7 @@ func convert(data any) any {
 			elements = append(elements, convert(item))
 		}
 		return elements
-	case entities.TupleT:
+	case core.TupleT:
 		var elements = make([]any, 0)
 		for _, item := range v {
 			if item == nil {
@@ -47,7 +47,7 @@ func toString(data any) string {
 		return strconv.FormatBool(v)
 	case string:
 		return v
-	case entities.AnyT:
+	case core.AnyT:
 		return string(v)
 	default:
 		panic(fmt.Sprintf("%v 无法作为键来使用", v))

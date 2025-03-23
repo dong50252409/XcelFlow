@@ -1,23 +1,24 @@
 package fb_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type FBStr struct {
-	*entities.Str
+	*types.Str
 }
 
 func init() {
 	typeRegister("str", newStr)
 }
 
-func newStr(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	s, err := entities.NewStr(typeStr, field)
+func newStr(typeStr string) (core.IType, error) {
+	s, err := types.NewStr(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &FBStr{s.(*entities.Str)}, nil
+	return &FBStr{Str: s.(*types.Str)}, nil
 }
 
 func (s *FBStr) String() string {

@@ -1,23 +1,24 @@
 package ts_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSBoolean struct {
-	*entities.Boolean
+	*types.Boolean
 }
 
 func init() {
 	typeRegister("bool", newBoolean)
 }
 
-func newBoolean(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	boolean, err := entities.NewBoolean(typeStr, field)
+func newBoolean(typeStr string) (core.IType, error) {
+	boolean, err := types.NewBoolean(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSBoolean{Boolean: boolean.(*entities.Boolean)}, nil
+	return &TSBoolean{Boolean: boolean.(*types.Boolean)}, nil
 }
 
 func (b *TSBoolean) String() string {

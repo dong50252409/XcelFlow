@@ -1,23 +1,24 @@
 package ts_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSTuple struct {
-	*entities.Tuple
+	*types.Tuple
 }
 
 func init() {
 	typeRegister("tuple", newTuple)
 }
 
-func newTuple(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	tuple, err := entities.NewTuple(typeStr, field)
+func newTuple(typeStr string) (core.IType, error) {
+	tuple, err := types.NewTuple(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSTuple{Tuple: tuple.(*entities.Tuple)}, nil
+	return &TSTuple{Tuple: tuple.(*types.Tuple)}, nil
 }
 
 func (*TSTuple) Convert(val any) string {
@@ -26,10 +27,6 @@ func (*TSTuple) Convert(val any) string {
 
 func (*TSTuple) String() string {
 	return "any[] | null"
-}
-
-func (*TSTuple) DefaultValueStr() string {
-	return "[]"
 }
 
 func (*TSTuple) DecoratorStr() string {

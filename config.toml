@@ -41,6 +41,8 @@ table_name_prefix = ""
 field_name_row = 4
 # 导出目标路径
 ts_directory = "./samples/typescript"
+# 方法名以驼峰命名 默认：不做转换
+ts_method_in_camel_case = false
 
 # json导出配置
 [schema.json]

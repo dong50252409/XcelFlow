@@ -1,7 +1,1 @@
-{{ template "ERL_HEAD_TEMPLATE" .}}
-
-{{ template "ERL_GET_TEMPLATE" .}}
-
-{{ template "ERL_LIST_TEMPLATE" .}}
-
 data(Key) -> erlang:element(#{{ .Table.ConfigName }}.val, get(Key)).

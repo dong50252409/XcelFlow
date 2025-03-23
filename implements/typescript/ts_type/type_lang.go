@@ -2,23 +2,24 @@ package ts_type
 
 import (
 	"fmt"
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type TSLang struct {
-	*entities.Lang
+	*types.Lang
 }
 
 func init() {
 	typeRegister("lang", newLang)
 }
 
-func newLang(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	lang, err := entities.NewLang(typeStr, field)
+func newLang(typeStr string) (core.IType, error) {
+	lang, err := types.NewLang(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &TSLang{Lang: lang.(*entities.Lang)}, nil
+	return &TSLang{Lang: lang.(*types.Lang)}, nil
 }
 
 func (l *TSLang) Convert(val any) string {
@@ -26,7 +27,7 @@ func (l *TSLang) Convert(val any) string {
 }
 
 func (l *TSLang) String() string {
-	return "string"
+	return "string | Uint8Array"
 }
 
 func (*TSLang) DecoratorStr() string {

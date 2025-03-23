@@ -3,6 +3,7 @@ package reader
 import (
 	"encoding/csv"
 	"os"
+	"xCelFlow/core"
 )
 
 type CSVReader struct {
@@ -13,7 +14,7 @@ func init() {
 	Register("csv", newCSVReader)
 }
 
-func newCSVReader(r *Reader) IReader {
+func newCSVReader(r *Reader) core.IReader {
 	return &CSVReader{r}
 }
 

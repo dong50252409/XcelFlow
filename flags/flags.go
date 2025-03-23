@@ -29,7 +29,7 @@ func init() {
 	flag.IntVar(&FieldCommentRow, "desc_row", 1, "指定字段注释所在行.")
 	flag.IntVar(&BodyStartRow, "start_row", 6, "指定表体开始行.")
 	flag.BoolVar(&Verify, "verify", false, "是否对生成的文件进行校验.")
-	flag.StringVar(&TomlPath, "config_path", "config.toml", "指定config.toml文件路径.")
+	flag.StringVar(&TomlPath, "config_path", "", "指定config.toml文件路径.")
 	flag.StringVar(&SchemaName, "schema_name", "", "指定config.toml中的区域进行导出.")
 
 	flag.Usage = usage

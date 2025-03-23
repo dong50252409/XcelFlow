@@ -1,23 +1,24 @@
 package fb_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type FBBoolean struct {
-	*entities.Boolean
+	*types.Boolean
 }
 
 func init() {
 	typeRegister("bool", newBoolean)
 }
 
-func newBoolean(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	boolean, err := entities.NewBoolean(typeStr, field)
+func newBoolean(typeStr string) (core.IType, error) {
+	boolean, err := types.NewBoolean(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &FBBoolean{boolean.(*entities.Boolean)}, nil
+	return &FBBoolean{Boolean: boolean.(*types.Boolean)}, nil
 }
 
 func (b *FBBoolean) String() string {

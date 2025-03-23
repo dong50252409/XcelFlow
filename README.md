@@ -22,11 +22,11 @@
     - `tuple(T)` 强类型元组，列表中的值必须为指定类型
       - `tuple(int)` (1,2,3)
       - `tuple(list(int))` ([1, 2], [3, 4], [5, 6])
-  - 字典：`dict` `dict(KT,VT)` 
-    - dict 弱类型字典，键是基础类型，值可以是任何类型
-      - `dict` {1 = [(1, 2), {2 = 3}, "中文"], abc = def}
-    - `dict(KT,VT)` 强类型字典，键和值必须值指定类型
-      - `dict(int, list(int))` {1 = [1, 2, 3], 2 = [4, 5, 6]}
+  - 字典：`map` `map(KT,VT)` 
+    - map 弱类型字典，键是基础类型，值可以是任何类型
+      - `map` {1 = [(1, 2), {2 = 3}, "中文"], abc = def}
+    - `map(KT,VT)` 强类型字典，键和值必须值指定类型
+      - `map(int, list(int))` {1 = [1, 2, 3], 2 = [4, 5, 6]}
 - [x] 支持任意类型 
   - `any` 支持填入以上所有类型数据 
 
@@ -56,12 +56,12 @@
 - [x] `resource(资源路径[,值作用域])` 资源装饰器 
   - 设置当前列所引用的本地资源路径，检查文件是否存在，否则报错
   - 用法 `resource(samples/icon) resource(samples/icon,$.e) resource(samples/icon,$.e[0]) resource(samples/icon,$.v)`
-- [] `ref_table(表名,索引字段名)` 引用表装饰器
-  - 设置当前列为引用表，可以引用其他表中的多行数据，具体用法待定
-  - 用法 `ref_table(item, id)`
+- [] `ref_table(表名)` 引用表装饰器
+  - 设置当前列的数据引用自装饰器指定的表，列的类型必须为list，值为被引用表第一列的值，被引用表的第一列作为主键进行数据匹配，匹配成功则将匹配到的数据赋值给当前列
+  - 用法 `ref_table(item)`
 - [] `skip_table([模式名, ...])` 跳过表生成装饰器
   - 设置指定模式的表不生成配置数据，不输出任何内容，为空则跳过任何模式的配表生成
-  - 用法 `skip_table([erlang])`
+  - 用法 `skip_table() skip_table(erlang, typescript)`
 
 ## 以支持导出模板
 - [x] Erlang
@@ -75,7 +75,7 @@
 - 支持ref_table、skip_table装饰器
 - 支持自定义模板
 - 支持多语言
-- 创建结构单例化 reader、parser等
+- 支持按列解析数据
 - 整理错误码
 
 ## 扩展

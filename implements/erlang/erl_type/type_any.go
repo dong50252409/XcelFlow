@@ -1,23 +1,24 @@
 package erl_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type ErlAny struct {
-	*entities.Any
+	*types.Any
 }
 
 func init() {
 	typeRegister("any", newAny)
 }
 
-func newAny(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	anyValue, err := entities.NewAny(typeStr, field)
+func newAny(typeStr string) (core.IType, error) {
+	anyValue, err := types.NewAny(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlAny{anyValue.(*entities.Any)}, nil
+	return &ErlAny{Any: anyValue.(*types.Any)}, nil
 }
 
 func (s *ErlAny) Convert(val any) string {
@@ -27,8 +28,4 @@ func (s *ErlAny) Convert(val any) string {
 
 func (s *ErlAny) String() string {
 	return "term()"
-}
-
-func (s *ErlAny) DefaultValueStr() string {
-	return "undefined"
 }

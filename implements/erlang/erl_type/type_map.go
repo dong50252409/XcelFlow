@@ -1,23 +1,24 @@
 package erl_type
 
 import (
-	"xCelFlow/entities"
+	"xCelFlow/core"
+	"xCelFlow/types"
 )
 
 type ErlMap struct {
-	*entities.Map
+	*types.Map
 }
 
 func init() {
 	typeRegister("map", newMap)
 }
 
-func newMap(typeStr string, field *entities.Field) (entities.ITypeSystem, error) {
-	mapType, err := entities.NewMap(typeStr, field)
+func newMap(typeStr string) (core.IType, error) {
+	mapType, err := types.NewMap(typeStr)
 	if err != nil {
 		return nil, err
 	}
-	return &ErlMap{mapType.(*entities.Map)}, nil
+	return &ErlMap{Map: mapType.(*types.Map)}, nil
 }
 
 func (*ErlMap) Convert(val any) string {
@@ -26,8 +27,4 @@ func (*ErlMap) Convert(val any) string {
 
 func (m *ErlMap) String() string {
 	return "map()"
-}
-
-func (*ErlMap) DefaultValueStr() string {
-	return "#{}"
 }
